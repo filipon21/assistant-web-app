@@ -6,6 +6,7 @@ import edu.ib.webapp.common.exception.RoleException;
 import edu.ib.webapp.common.exception.UserException;
 import edu.ib.webapp.user.mapper.UserMapper;
 import edu.ib.webapp.user.model.request.UserRequest;
+import edu.ib.webapp.user.model.request.UserUpdateRequest;
 import edu.ib.webapp.user.model.response.UserResponse;
 import edu.ib.webapp.user.repository.RoleRepository;
 import edu.ib.webapp.user.repository.UserRepository;
@@ -57,6 +58,10 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(userRequest.getPhoneNumber());
         user.setRoles(userRoles);
         user.setUserPassword(passwordEncoder.getEncodedPassword(userRequest.getUserPassword()));
+        user.setAddress(userRequest.getAddress());
+        user.setVoivodeship(userRequest.getVoivodeship());
+        user.setPostalCode(userRequest.getPostalCode());
+        user.setCountry(userRequest.getCountry());
 
         userRepository.save(user);
 
@@ -64,17 +69,51 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse updateStatus(Boolean isOnline, Long id) {
-        User userCheck = userRepository.findById(id).orElse(null);
-
-        if (userCheck == null) {
-            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.USERNAME_MUST_BE_UNIQUE);
-        }
+        User userCheck = checkIfUserExists(id);
 
         userCheck.setIsOnline(isOnline);
 
         userRepository.save(userCheck);
 
         return userMapper.userToUserResponse(userCheck);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateUser(UserUpdateRequest userRequest, Long id) {
+        User userCheck = checkIfUserExists(id);
+
+        userCheck.setUserName(userRequest.getUserName());
+        userCheck.setPesel(userRequest.getPesel());
+        userCheck.setUserFirstName(userRequest.getUserFirstName());
+        userCheck.setUserLastName(userRequest.getUserLastName());
+        userCheck.setPhoneNumber(userRequest.getPhoneNumber());
+        userCheck.setAddress(userRequest.getAddress());
+        userCheck.setVoivodeship(userRequest.getVoivodeship());
+        userCheck.setPostalCode(userRequest.getPostalCode());
+        userCheck.setCountry(userRequest.getCountry());
+
+        userRepository.save(userCheck);
+
+        return userMapper.userToUserResponse(userCheck);
+    }
+
+    @Override
+    public UserResponse getUser(Long id) {
+      User userCheck = checkIfUserExists(id);
+
+      return userMapper.userToUserResponse(userCheck);
+    }
+
+
+    private User checkIfUserExists(Long id){
+        User userCheck = userRepository.findById(id).orElse(null);
+
+        if (userCheck == null) {
+            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.USER_NOT_FOUND);
+        }
+        return userCheck;
     }
 }
