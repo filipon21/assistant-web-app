@@ -1,6 +1,8 @@
 package edu.ib.webapp.user.service;
 
+import edu.ib.webapp.user.model.dto.TelevisitPaginationDto;
 import edu.ib.webapp.user.model.request.TelevisitRequest;
+import edu.ib.webapp.user.model.response.TelevisitListResponse;
 import edu.ib.webapp.user.model.response.TelevisitResponse;
 
 import java.util.List;
@@ -14,4 +16,6 @@ public interface TelevisitService {
     List<TelevisitResponse> getUserVisits(Long id);
 
     TelevisitResponse getVisit(Long id);
+
+    TelevisitListResponse getAllTelevisitsPaginated(TelevisitPaginationDto televisitPaginationDto);
 }

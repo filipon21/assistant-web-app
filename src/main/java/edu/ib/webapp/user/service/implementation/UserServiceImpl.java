@@ -1,5 +1,8 @@
 package edu.ib.webapp.user.service.implementation;
 
+import edu.ib.webapp.user.entity.Role;
+import edu.ib.webapp.user.model.dto.AssistantInfoDto;
+import edu.ib.webapp.user.model.dto.AssistantPaginationDto;
 import edu.ib.webapp.common.configuration.PasswordEncoderCustom;
 import edu.ib.webapp.common.exception.ExceptionMessage;
 import edu.ib.webapp.common.exception.RoleException;
@@ -7,21 +10,30 @@ import edu.ib.webapp.common.exception.UserException;
 import edu.ib.webapp.user.mapper.UserMapper;
 import edu.ib.webapp.user.model.request.UserRequest;
 import edu.ib.webapp.user.model.request.UserUpdateRequest;
+import edu.ib.webapp.user.model.response.AssistantListResponse;
 import edu.ib.webapp.user.model.response.UserResponse;
 import edu.ib.webapp.user.repository.RoleRepository;
 import edu.ib.webapp.user.repository.UserRepository;
-import edu.ib.webapp.user.entity.Role;
 import edu.ib.webapp.user.entity.User;
+import edu.ib.webapp.user.repository.specification.AssistantSpecification;
 import edu.ib.webapp.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static edu.ib.webapp.user.pagination.PaginationSupport.getPageRequest;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -57,6 +69,7 @@ public class UserServiceImpl implements UserService {
         user.setIsActive(true);
         user.setPhoneNumber(userRequest.getPhoneNumber());
         user.setRoles(userRoles);
+        user.setBirthday(userRequest.getBirthday());
         user.setUserPassword(passwordEncoder.getEncodedPassword(userRequest.getUserPassword()));
         user.setAddress(userRequest.getAddress());
         user.setVoivodeship(userRequest.getVoivodeship());
@@ -101,6 +114,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public AssistantListResponse getAllAssistantPaginated(AssistantPaginationDto assistantPaginationDto) {
+        AssistantSpecification assistantSpecification = new AssistantSpecification(assistantPaginationDto.getSearchingParams());
+        PageRequest assistantPageRequest = getPageRequest(assistantPaginationDto);
+        Page<User> assistantPage = userRepository.findAll(assistantSpecification, assistantPageRequest);
+        List<AssistantInfoDto> assistantInfoDtos = assistantPage.stream().map(userMapper::userToAssistantInfoDto)
+                .collect(Collectors.toList());
+
+        log.info("Poprawne pobranie listy asystentów");
+
+        Page<AssistantInfoDto> assistantInfoDtoPage = new PageImpl(assistantInfoDtos, assistantPage.getPageable(),
+                assistantPage.getTotalElements());
+        return new AssistantListResponse(assistantInfoDtoPage);
+    }
+
+    @Override
     public UserResponse getUser(Long id) {
       User userCheck = checkIfUserExists(id);
 
@@ -116,4 +144,5 @@ public class UserServiceImpl implements UserService {
         }
         return userCheck;
     }
+
 }

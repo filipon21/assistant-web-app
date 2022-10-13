@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -25,6 +23,8 @@ public class UserResponse {
 
     private String userLastName;
 
+    private LocalDate birthday;
+
     private String phoneNumber;
 
     private String pesel;
@@ -34,6 +34,8 @@ public class UserResponse {
     private Boolean isOnline;
 
     private String address;
+
+    private String town;
 
     private String postalCode;
 

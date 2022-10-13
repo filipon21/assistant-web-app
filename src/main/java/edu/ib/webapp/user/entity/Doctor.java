@@ -25,4 +25,5 @@ public class Doctor {
     @ToString.Exclude
     @OneToOne(mappedBy = "doctor", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private User user;
+
 }

@@ -8,6 +8,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -37,9 +38,11 @@ public class User {
     @Size(max = 100)
     private String userLastName;
 
+    private LocalDate birthday;
+
     @NotBlank
     @Column(unique = true)
-    @Size(min = 9, max = 12)
+    @Size(min = 9, max = 9)
     private String phoneNumber;
 
     @NotBlank
@@ -48,24 +51,23 @@ public class User {
     private String pesel;
 
     @NotBlank
-    @Size(max = 200)
+    @Size(max = 200, min = 6)
     private String userPassword;
 
-    @NotBlank
     @Size(max = 100)
     private String address;
 
-    @NotBlank
     @Size(max = 10)
     private String postalCode;
 
-    @NotBlank
     @Size(max = 100)
     private String voivodeship;
 
-    @NotBlank
     @Size(max = 100)
     private String country;
+
+    @Size(max = 100)
+    private String town;
 
     //@NotNull
     private Boolean isOnline;

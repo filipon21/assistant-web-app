@@ -1,6 +1,7 @@
 package edu.ib.webapp.user.mapper;
 
 import edu.ib.webapp.user.entity.Televisit;
+import edu.ib.webapp.user.model.dto.TelevisitInfoDto;
 import edu.ib.webapp.user.model.request.TelevisitRequest;
 import edu.ib.webapp.user.model.response.TelevisitResponse;
 import org.mapstruct.InjectionStrategy;
@@ -13,4 +14,6 @@ public interface TelevisitMapper {
     TelevisitResponse visitToVisitResponse(Televisit televisit);
 
     Televisit visitRequestToVisit(TelevisitRequest televisitRequest);
+
+    TelevisitInfoDto televisitToTelevisitInfoDto(Televisit televisit);
 }

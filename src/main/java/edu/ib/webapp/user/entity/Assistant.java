@@ -25,4 +25,5 @@ public class Assistant {
     @ToString.Exclude
     @OneToOne(mappedBy = "assistant", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private User user;
+
 }

@@ -7,20 +7,31 @@ import edu.ib.webapp.user.entity.User;
 import edu.ib.webapp.user.enums.TelevisitStatusEnum;
 import edu.ib.webapp.user.enums.TelevisitTypeEnum;
 import edu.ib.webapp.user.mapper.TelevisitMapper;
+import edu.ib.webapp.user.model.dto.TelevisitInfoDto;
+import edu.ib.webapp.user.model.dto.TelevisitPaginationDto;
 import edu.ib.webapp.user.model.request.TelevisitRequest;
+import edu.ib.webapp.user.model.response.TelevisitListResponse;
 import edu.ib.webapp.user.model.response.TelevisitResponse;
 import edu.ib.webapp.user.repository.UserRepository;
 import edu.ib.webapp.user.repository.TelevisitRepository;
+import edu.ib.webapp.user.repository.specification.TelevisitSpecification;
 import edu.ib.webapp.user.service.TelevisitService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static edu.ib.webapp.user.pagination.TelevisitPaginationSupport.getPageRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +76,8 @@ public class TelevisitServiceImpl implements TelevisitService {
 
         List<Televisit> assistantTelevisits = assistantCheck.getTelevisits();
         assistantTelevisits.add(televisit);
+
+        televisit.setStartTime(LocalDateTime.now());
 
         televisit.setTelevisitStatusEnum(TelevisitStatusEnum.WAITING);
 
@@ -114,6 +127,22 @@ public class TelevisitServiceImpl implements TelevisitService {
             throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.VISIT_NOT_FOUND);
         }
         return televisitMapper.visitToVisitResponse(televisit);
+    }
+
+    @Override
+    public TelevisitListResponse getAllTelevisitsPaginated(TelevisitPaginationDto televisitPaginationDto) {
+        TelevisitSpecification televisitSpecification = new TelevisitSpecification(televisitPaginationDto.getSearchingParams());
+
+        PageRequest televisitPageRequest = getPageRequest(televisitPaginationDto);
+        Page<Televisit> televisitPage = televisitRepository.findAll(televisitSpecification, televisitPageRequest);
+
+        List<TelevisitInfoDto> televisitInfoDtos = televisitPage.stream().map(televisitMapper::televisitToTelevisitInfoDto)
+                .collect(Collectors.toList());
+        log.info("Poprawne pobranie listy telewizyt");
+
+        Page<TelevisitInfoDto> televisitInfoDtoPage = new PageImpl(televisitInfoDtos, televisitPage.getPageable(),
+                televisitPage.getTotalElements());
+        return new TelevisitListResponse(televisitInfoDtoPage);
     }
 
     public Televisit findVisitById(Long id){

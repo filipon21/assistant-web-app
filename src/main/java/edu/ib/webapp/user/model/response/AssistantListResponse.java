@@ -1,6 +1,6 @@
-package edu.ib.webapp.api.model.response;
+package edu.ib.webapp.user.model.response;
 
-import edu.ib.webapp.api.model.dto.AssistantInfoDto;
+import edu.ib.webapp.user.model.dto.AssistantInfoDto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum TelevisitTypeEnum {
     PHONE("Telefoniczna"),
+    STATIONARY("Stacjonarna"),
     CHAT("Czat");
 
     private final String type;

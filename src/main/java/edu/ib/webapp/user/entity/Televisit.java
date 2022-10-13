@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -30,6 +31,17 @@ public class Televisit {
     @NotNull
     @Enumerated(EnumType.STRING)
     private TelevisitTypeEnum televisitTypeEnum;
+
+    @NotNull
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
+
+    private String recommendation;
+
+    private String prescription;
+
+    private String exemption;
 
     @ManyToMany(mappedBy = "televisits")
     private List<User> users;

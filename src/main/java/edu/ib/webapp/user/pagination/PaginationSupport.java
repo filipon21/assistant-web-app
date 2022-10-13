@@ -1,8 +1,8 @@
-package edu.ib.webapp.api.pagination;
+package edu.ib.webapp.user.pagination;
 
 
-import edu.ib.webapp.api.model.dto.AssistantPaginationDto;
-import edu.ib.webapp.api.model.dto.AssistantSearchingParams;
+import edu.ib.webapp.user.model.dto.AssistantPaginationDto;
+import edu.ib.webapp.user.model.dto.AssistantSearchingParamsDto;
 import edu.ib.webapp.common.enums.SortingDirectionEnum;
 import edu.ib.webapp.common.pagination.SortingParamsDto;
 import lombok.experimental.UtilityClass;
@@ -42,7 +42,7 @@ public class PaginationSupport {
     }
 
     public AssistantPaginationDto getAssistantPaginationDto(Integer pageNumber, Integer pageSize, SortingParamsDto sortingParams,
-                                                                   AssistantSearchingParams searchingParams) {
+                                                            AssistantSearchingParamsDto searchingParams) {
         return AssistantPaginationDto.builder()
                 .pageNumber(pageNumber)
                 .pageSize(pageSize)
@@ -51,9 +51,9 @@ public class PaginationSupport {
                 .build();
     }
 
-    public AssistantSearchingParams getAssistantSearchingParams(String userFirstName, String userLastName, String phoneNumber,
-                                                                       Boolean isOnline) {
-        return AssistantSearchingParams.builder()
+    public AssistantSearchingParamsDto getAssistantSearchingParams(String userFirstName, String userLastName, String phoneNumber,
+                                                                   Boolean isOnline) {
+        return AssistantSearchingParamsDto.builder()
                 .userFirstName(userFirstName)
                 .userLastName(userLastName)
                 .isOnline(isOnline)

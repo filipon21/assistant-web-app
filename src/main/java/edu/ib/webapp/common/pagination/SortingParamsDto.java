@@ -15,4 +15,6 @@ public class SortingParamsDto {
 
     private String sortParameter;
 
+
+
 }

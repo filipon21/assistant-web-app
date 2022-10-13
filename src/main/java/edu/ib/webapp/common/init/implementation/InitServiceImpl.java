@@ -11,14 +11,11 @@ import edu.ib.webapp.user.enums.DoctorSpecializationEnum;
 import edu.ib.webapp.user.repository.RoleRepository;
 import edu.ib.webapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor

@@ -1,17 +1,15 @@
-package edu.ib.webapp.api.model.dto;
+package edu.ib.webapp.user.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class AssistantInfoDto {
-
-    private Long id;
+public class AssistantSearchingParamsDto {
 
     private String userFirstName;
 

@@ -1,11 +1,15 @@
 package edu.ib.webapp.user.controller;
 
+import edu.ib.webapp.common.pagination.SortingParamsDto;
+import edu.ib.webapp.user.model.dto.AssistantPaginationDto;
+import edu.ib.webapp.user.model.dto.AssistantSearchingParamsDto;
 import edu.ib.webapp.user.model.request.UserRequest;
 import edu.ib.webapp.user.model.request.UserUpdateRequest;
+import edu.ib.webapp.user.model.response.AssistantListResponse;
 import edu.ib.webapp.user.model.response.UserResponse;
+import edu.ib.webapp.user.pagination.PaginationSupport;
 import edu.ib.webapp.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,7 +27,7 @@ public class UserController {
     }
 
     @PatchMapping({"/{id}"})
-    public UserResponse updateUser(@RequestBody @Valid UserUpdateRequest user, Long id) {
+    public UserResponse updateUser(@RequestBody @Valid UserUpdateRequest user, @PathVariable Long id) {
         return userService.updateUser(user, id);
     }
 
@@ -35,6 +39,26 @@ public class UserController {
     @GetMapping("/{id}")
     public UserResponse getUser(@PathVariable Long id){
         return userService.getUser(id);
+    }
+
+    @GetMapping("/assistant")
+    public AssistantListResponse getAllTemplates(@RequestParam Integer pageNumber,
+                                                 @RequestParam Integer pageSize,
+                                                 @RequestParam(required = false) String sortParameter,
+                                                 @RequestParam(required = false) String sortDirection,
+                                                 @RequestParam(required = false) String userFirstName,
+                                                 @RequestParam(required = false) String userLastName,
+                                                 @RequestParam(required = false) String phoneNumber,
+                                                 @RequestParam(required = false) Boolean isOnline)
+    {
+
+        SortingParamsDto sortingParams = PaginationSupport.getSortingParams(sortParameter, sortDirection);
+        AssistantSearchingParamsDto searchingParams = PaginationSupport.getAssistantSearchingParams(userFirstName, userLastName,
+                phoneNumber, isOnline);
+        AssistantPaginationDto paginationDto = PaginationSupport.getAssistantPaginationDto(pageNumber, pageSize, sortingParams,
+                searchingParams);
+
+        return userService.getAllAssistantPaginated(paginationDto);
     }
 
 }

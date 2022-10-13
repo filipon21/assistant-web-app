@@ -1,6 +1,5 @@
-package edu.ib.webapp.user.model.response;
+package edu.ib.webapp.user.model.dto;
 
-import edu.ib.webapp.user.entity.User;
 import edu.ib.webapp.user.enums.TelevisitStatusEnum;
 import edu.ib.webapp.user.enums.TelevisitTypeEnum;
 import lombok.AllArgsConstructor;
@@ -12,23 +11,22 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.time.LocalDateTime;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class TelevisitResponse {
+public class TelevisitSearchingParamsDto {
 
-    private Long id;
-
-    @Enumerated(EnumType.STRING)
-    private TelevisitStatusEnum televisitStatusEnum;
-
-    @Enumerated(EnumType.STRING)
-    private TelevisitTypeEnum televisitTypeEnum;
+    private Long userId;
 
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
 
-    private UserResponse user;
+    @Enumerated(EnumType.STRING)
+    private TelevisitTypeEnum televisitTypeEnum;
+
+    @Enumerated(EnumType.STRING)
+    private TelevisitStatusEnum televisitStatusEnum;
+
 }

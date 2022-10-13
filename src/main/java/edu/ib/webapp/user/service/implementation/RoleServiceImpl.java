@@ -1,7 +1,7 @@
 package edu.ib.webapp.user.service.implementation;
 
-import edu.ib.webapp.user.repository.RoleRepository;
 import edu.ib.webapp.user.entity.Role;
+import edu.ib.webapp.user.repository.RoleRepository;
 import edu.ib.webapp.user.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

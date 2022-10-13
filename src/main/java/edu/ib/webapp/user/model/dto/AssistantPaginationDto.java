@@ -1,4 +1,4 @@
-package edu.ib.webapp.api.model.dto;
+package edu.ib.webapp.user.model.dto;
 
 import edu.ib.webapp.common.pagination.SortingParamsDto;
 import lombok.AllArgsConstructor;
@@ -21,5 +21,5 @@ public class AssistantPaginationDto {
 
     private SortingParamsDto sortingParams;
 
-    private AssistantSearchingParams searchingParams;
+    private AssistantSearchingParamsDto searchingParams;
 }

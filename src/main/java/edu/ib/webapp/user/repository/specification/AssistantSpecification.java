@@ -1,6 +1,6 @@
-package edu.ib.webapp.api.repository.specification;
+package edu.ib.webapp.user.repository.specification;
 
-import edu.ib.webapp.api.model.dto.AssistantSearchingParams;
+import edu.ib.webapp.user.model.dto.AssistantSearchingParamsDto;
 import edu.ib.webapp.user.entity.User;
 import edu.ib.webapp.user.entity.User_;
 
@@ -19,7 +19,7 @@ import java.util.*;
 @AllArgsConstructor
 public class AssistantSpecification implements Specification<User> {
 
-    private AssistantSearchingParams searchingParams;
+    private AssistantSearchingParamsDto searchingParams;
 
     @Override
     public Predicate toPredicate(Root<User> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
