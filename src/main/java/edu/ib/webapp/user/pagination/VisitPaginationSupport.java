@@ -2,10 +2,10 @@ package edu.ib.webapp.user.pagination;
 
 import edu.ib.webapp.common.enums.SortingDirectionEnum;
 import edu.ib.webapp.common.pagination.SortingParamsDto;
-import edu.ib.webapp.user.enums.TelevisitStatusEnum;
-import edu.ib.webapp.user.enums.TelevisitTypeEnum;
-import edu.ib.webapp.user.model.dto.TelevisitPaginationDto;
-import edu.ib.webapp.user.model.dto.TelevisitSearchingParamsDto;
+import edu.ib.webapp.user.enums.VisitStatusEnum;
+import edu.ib.webapp.user.enums.VisitTypeEnum;
+import edu.ib.webapp.user.model.dto.VisitPaginationDto;
+import edu.ib.webapp.user.model.dto.VisitSearchingParamsDto;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
@@ -14,9 +14,9 @@ import org.springframework.data.domain.Sort;
 import java.time.LocalDateTime;
 
 @UtilityClass
-public class TelevisitPaginationSupport {
+public class VisitPaginationSupport {
 
-    public static PageRequest getPageRequest(TelevisitPaginationDto paginationDto) {
+    public static PageRequest getPageRequest(VisitPaginationDto paginationDto) {
         SortingParamsDto sortingParams = paginationDto.getSortingParams();
         String sortingDirection = null;
         String sortingParameter = null;
@@ -46,9 +46,9 @@ public class TelevisitPaginationSupport {
         return Sort.by(new Sort.Order(direction, sortParam).ignoreCase());
     }
 
-    public TelevisitPaginationDto getTelevisitPaginationDto(Integer pageNumber, Integer pageSize, SortingParamsDto sortingParams,
-                                                          TelevisitSearchingParamsDto searchingParams) {
-        return TelevisitPaginationDto.builder()
+    public VisitPaginationDto getTelevisitPaginationDto(Integer pageNumber, Integer pageSize, SortingParamsDto sortingParams,
+                                                        VisitSearchingParamsDto searchingParams) {
+        return VisitPaginationDto.builder()
                 .pageNumber(pageNumber)
                 .pageSize(pageSize)
                 .sortingParams(sortingParams)
@@ -56,12 +56,12 @@ public class TelevisitPaginationSupport {
                 .build();
     }
 
-    public TelevisitSearchingParamsDto getTelevisitSearchingParams(Long userId, TelevisitStatusEnum status, TelevisitTypeEnum type,
-                                                                   LocalDateTime startTime, LocalDateTime endTime) {
-        return TelevisitSearchingParamsDto.builder()
+    public VisitSearchingParamsDto getTelevisitSearchingParams(Long userId, VisitStatusEnum status, VisitTypeEnum type,
+                                                               LocalDateTime startTime, LocalDateTime endTime) {
+        return VisitSearchingParamsDto.builder()
                 .userId(userId)
-                .televisitStatusEnum(status)
-                .televisitTypeEnum(type)
+                .visitStatusEnum(status)
+                .visitTypeEnum(type)
                 .startTime(startTime)
                 .endTime(endTime)
                 .build();

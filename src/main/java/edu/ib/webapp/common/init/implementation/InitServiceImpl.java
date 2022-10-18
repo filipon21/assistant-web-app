@@ -8,6 +8,8 @@ import edu.ib.webapp.user.entity.Role;
 import edu.ib.webapp.user.entity.User;
 import edu.ib.webapp.user.enums.AssistantSpecializationEnum;
 import edu.ib.webapp.user.enums.DoctorSpecializationEnum;
+import edu.ib.webapp.user.repository.AssistantRepository;
+import edu.ib.webapp.user.repository.DoctorRepository;
 import edu.ib.webapp.user.repository.RoleRepository;
 import edu.ib.webapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,10 @@ public class InitServiceImpl implements InitService {
     private final RoleRepository roleRepository;
 
     private final UserRepository userRepository;
+
+    private final DoctorRepository doctorRepository;
+
+    private final AssistantRepository assistantRepository;
 
     private final PasswordEncoderCustom passwordEncoderCustom;
 
@@ -48,6 +54,22 @@ public class InitServiceImpl implements InitService {
         doctorRole.setRoleDescription("Rola dla lekarza");
         roleRepository.save(doctorRole);
 
+        Doctor doctorCardio = new Doctor();
+        doctorCardio.setDoctorSpecializationEnum(DoctorSpecializationEnum.CARDIOLOGIST);
+        doctorRepository.save(doctorCardio);
+
+        Doctor doctor1 = new Doctor();
+        doctor1.setDoctorSpecializationEnum(DoctorSpecializationEnum.INTERNIST);
+        doctorRepository.save(doctor1);
+
+        Assistant assistant1 = new Assistant();
+        assistant1.setAssistantSpecializationEnum(AssistantSpecializationEnum.RECRUIT);
+        assistantRepository.save(assistant1);
+
+        Assistant assistant = new Assistant();
+        assistant.setAssistantSpecializationEnum(AssistantSpecializationEnum.PRACTICED);
+        assistantRepository.save(assistant);
+
         User assistantUser = new User();
         assistantUser.setUserName("assistant@gmail.com");
         assistantUser.setUserPassword(passwordEncoderCustom.getEncodedPassword("ass123!"));
@@ -64,8 +86,6 @@ public class InitServiceImpl implements InitService {
         Set<Role> assistantRoles = new HashSet<>();
         assistantRoles.add(assistantRole);
         assistantUser.setRoles(assistantRoles);
-        Assistant assistant = new Assistant();
-        assistant.setAssistantSpecializationEnum(AssistantSpecializationEnum.PRACTICED);
         assistantUser.setAssistant(assistant);
         userRepository.save(assistantUser);
 
@@ -83,8 +103,7 @@ public class InitServiceImpl implements InitService {
         assistantUser1.setIsActive(true);
         assistantUser1.setUserLastName("Krej");
         assistantUser1.setRoles(assistantRoles);
-        Assistant assistant1 = new Assistant();
-        assistant1.setAssistantSpecializationEnum(AssistantSpecializationEnum.RECRUIT);
+
         assistantUser1.setAssistant(assistant1);
         userRepository.save(assistantUser1);
 
@@ -119,9 +138,8 @@ public class InitServiceImpl implements InitService {
         doctor.setVoivodeship("Dolnośląskie");
         doctor.setPhoneNumber("501455444");
         doctor.setIsActive(true);
-        Doctor userDoctor = new Doctor();
-        userDoctor.setDoctorSpecializationEnum(DoctorSpecializationEnum.CARDIOLOGIST);
-        doctor.setDoctor(userDoctor);
+
+        doctor.setDoctor(doctorCardio);
         Set<Role> doctorRoles = new HashSet<>();
         doctorRoles.add(doctorRole);
         doctor.setRoles(doctorRoles);
@@ -140,8 +158,7 @@ public class InitServiceImpl implements InitService {
         userDoctor1.setIsOnline(false);
         userDoctor1.setPhoneNumber("550455444");
         userDoctor1.setIsActive(true);
-        Doctor doctor1 = new Doctor();
-        doctor1.setDoctorSpecializationEnum(DoctorSpecializationEnum.INTERNIST);
+
         userDoctor1.setDoctor(doctor1);
         userDoctor1.setRoles(doctorRoles);
         userRepository.save(userDoctor1);

@@ -1,5 +1,7 @@
 package edu.ib.webapp.user.model.response;
 
+import edu.ib.webapp.user.entity.Assistant;
+import edu.ib.webapp.user.entity.Doctor;
 import edu.ib.webapp.user.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,6 +46,10 @@ public class UserResponse {
     private String country;
 
     private Boolean isActive;
+
+    private DoctorResponse doctor;
+
+    private AssistantResponse assistant;
 
     private Set<Role> roles;
 }

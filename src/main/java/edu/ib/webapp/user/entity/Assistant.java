@@ -6,6 +6,7 @@ import edu.ib.webapp.user.enums.DoctorSpecializationEnum;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -21,9 +22,10 @@ public class Assistant {
     @Enumerated(EnumType.STRING)
     private AssistantSpecializationEnum assistantSpecializationEnum;
 
-    @JsonBackReference
-    @ToString.Exclude
-    @OneToOne(mappedBy = "assistant", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    private User user;
+    @OneToMany(mappedBy = "assistant",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<User> user;
 
 }

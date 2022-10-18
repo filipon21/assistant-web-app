@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Data
 @Builder
-public class TelevisitPaginationDto {
+public class VisitPaginationDto {
 
     @NotNull
     private Integer pageSize;
@@ -22,6 +22,6 @@ public class TelevisitPaginationDto {
 
     private SortingParamsDto sortingParams;
 
-    private TelevisitSearchingParamsDto searchingParams;
+    private VisitSearchingParamsDto searchingParams;
 
 }

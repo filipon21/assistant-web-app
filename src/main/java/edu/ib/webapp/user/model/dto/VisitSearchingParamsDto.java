@@ -1,7 +1,7 @@
 package edu.ib.webapp.user.model.dto;
 
-import edu.ib.webapp.user.enums.TelevisitStatusEnum;
-import edu.ib.webapp.user.enums.TelevisitTypeEnum;
+import edu.ib.webapp.user.enums.VisitStatusEnum;
+import edu.ib.webapp.user.enums.VisitTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Builder
-public class TelevisitSearchingParamsDto {
+public class VisitSearchingParamsDto {
 
     private Long userId;
 
@@ -24,9 +24,9 @@ public class TelevisitSearchingParamsDto {
     private LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
-    private TelevisitTypeEnum televisitTypeEnum;
+    private VisitTypeEnum visitTypeEnum;
 
     @Enumerated(EnumType.STRING)
-    private TelevisitStatusEnum televisitStatusEnum;
+    private VisitStatusEnum visitStatusEnum;
 
 }

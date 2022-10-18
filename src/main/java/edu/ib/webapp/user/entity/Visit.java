@@ -1,11 +1,9 @@
 package edu.ib.webapp.user.entity;
 
-import edu.ib.webapp.user.enums.TelevisitStatusEnum;
-import edu.ib.webapp.user.enums.TelevisitTypeEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import edu.ib.webapp.user.enums.VisitStatusEnum;
+import edu.ib.webapp.user.enums.VisitTypeEnum;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,8 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Data
-@Table(name = "TELEVISITS")
-public class Televisit {
+@Table(name = "Visits")
+public class Visit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,23 +24,28 @@ public class Televisit {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private TelevisitStatusEnum televisitStatusEnum;
+    private VisitStatusEnum visitStatusEnum;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private TelevisitTypeEnum televisitTypeEnum;
+    private VisitTypeEnum visitTypeEnum;
 
     @NotNull
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
 
+    private String address;
+
     private String recommendation;
 
-    private String prescription;
+    @JsonBackReference
+    @ToString.Exclude
+    @OneToOne(mappedBy = "visit", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    private Prescription prescription;
 
     private String exemption;
 
-    @ManyToMany(mappedBy = "televisits")
+    @ManyToMany(mappedBy = "visits")
     private List<User> users;
 }

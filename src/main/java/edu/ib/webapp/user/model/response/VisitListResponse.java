@@ -1,6 +1,6 @@
 package edu.ib.webapp.user.model.response;
 
-import edu.ib.webapp.user.model.dto.TelevisitInfoDto;
+import edu.ib.webapp.user.model.dto.VisitInfoDto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
@@ -10,6 +10,6 @@ import org.springframework.data.domain.Page;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TelevisitListResponse {
-    Page<TelevisitInfoDto> televisitPage;
+public class VisitListResponse {
+    Page<VisitInfoDto> televisitPage;
 }

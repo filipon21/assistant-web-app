@@ -5,11 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum TelevisitStatusEnum {
-    WAITING("Czekanie"),
-    STARTED("W_trakcie"),
-    REJECTED("Odrzucono"),
-    ENDED("Zakończona");
+public enum VisitTypeEnum {
+    PHONE("Telefoniczna"),
+    STATIONARY("Stacjonarna"),
+    CHAT("Czat");
 
     private final String type;
 }

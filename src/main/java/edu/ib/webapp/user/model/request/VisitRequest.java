@@ -1,8 +1,7 @@
-package edu.ib.webapp.user.model.response;
+package edu.ib.webapp.user.model.request;
 
-import edu.ib.webapp.user.entity.User;
-import edu.ib.webapp.user.enums.TelevisitStatusEnum;
-import edu.ib.webapp.user.enums.TelevisitTypeEnum;
+import edu.ib.webapp.user.enums.VisitStatusEnum;
+import edu.ib.webapp.user.enums.VisitTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,19 +15,24 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TelevisitResponse {
-
-    private Long id;
+public class VisitRequest {
 
     @Enumerated(EnumType.STRING)
-    private TelevisitStatusEnum televisitStatusEnum;
+    private VisitStatusEnum visitStatusEnum;
 
     @Enumerated(EnumType.STRING)
-    private TelevisitTypeEnum televisitTypeEnum;
+    private VisitTypeEnum visitTypeEnum;
 
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
 
-    private UserResponse user;
+    private String address;
+
+    private String recommendation;
+
+    private String prescription;
+
+    private String exemption;
+
 }

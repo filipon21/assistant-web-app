@@ -1,7 +1,7 @@
 package edu.ib.webapp.user.model.dto;
 
-import edu.ib.webapp.user.enums.TelevisitStatusEnum;
-import edu.ib.webapp.user.enums.TelevisitTypeEnum;
+import edu.ib.webapp.user.enums.VisitStatusEnum;
+import edu.ib.webapp.user.enums.VisitTypeEnum;
 import edu.ib.webapp.user.model.response.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,17 +17,19 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TelevisitInfoDto {
+public class VisitInfoDto {
 
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private TelevisitStatusEnum televisitStatusEnum;
+    private VisitStatusEnum visitStatusEnum;
 
     @Enumerated(EnumType.STRING)
-    private TelevisitTypeEnum televisitTypeEnum;
+    private VisitTypeEnum visitTypeEnum;
 
     private LocalDateTime startTime;
 
-    private List<UserResponse> users;
+    private LocalDateTime endTime;
+
+    private List<UserResponseInfoDto> users;
 }

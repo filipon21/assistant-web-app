@@ -1,5 +1,6 @@
 package edu.ib.webapp.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
@@ -94,13 +95,17 @@ public class User {
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "televisit_id")}
     )
-    private List<Televisit> televisits;
+    private List<Visit> visits;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JsonBackReference
+    @ToString.Exclude
+    @ManyToOne
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JsonBackReference
+    @ToString.Exclude
+    @ManyToOne
     @JoinColumn(name = "assistant_id")
     private Assistant assistant;
 }
