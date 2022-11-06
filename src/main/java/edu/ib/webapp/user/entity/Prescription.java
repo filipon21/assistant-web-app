@@ -1,9 +1,7 @@
 package edu.ib.webapp.user.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -25,7 +23,11 @@ public class Prescription {
     @NotBlank
     private String code;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    @JoinColumn(name = "visit_id")
+    @NotBlank
+    private String type;
+
+    @JsonBackReference
+    @ToString.Exclude
+    @OneToOne(mappedBy = "prescription", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private Visit visit;
 }

@@ -5,16 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileUploadResponse {
-    private String fileName;
-    private String fileCode;
-    private String type;
-    private long size;
+public class ExemptionResponse {
 
-    // getters and setters are not shown for brevity
+    private Long id;
+
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
 
 }

@@ -24,12 +24,12 @@ public class VisitPaginationSupport {
             sortingDirection = sortingParams.getSortDirection();
             sortingParameter = sortingParams.getSortParameter();
         }
-        return getTelevisitPageRequest(paginationDto.getPageNumber(), paginationDto.getPageSize(),
+        return getVisitPageRequest(paginationDto.getPageNumber(), paginationDto.getPageSize(),
                 sortingDirection, sortingParameter);
     }
 
-    private static PageRequest getTelevisitPageRequest(Integer pageNumber, Integer pageSize, String sortingDirection,
-                                                       String sortingParameter) {
+    private static PageRequest getVisitPageRequest(Integer pageNumber, Integer pageSize, String sortingDirection,
+                                                   String sortingParameter) {
         return (StringUtils.isEmpty(sortingDirection) || StringUtils.isEmpty(sortingParameter)) ?
                 PageRequest.of(pageNumber, pageSize, prepareDefaultTelevisitSort()) :
                 PageRequest.of(pageNumber, pageSize, prepareSortWithIgnoreCase(sortingParameter, sortingDirection));
@@ -46,8 +46,8 @@ public class VisitPaginationSupport {
         return Sort.by(new Sort.Order(direction, sortParam).ignoreCase());
     }
 
-    public VisitPaginationDto getTelevisitPaginationDto(Integer pageNumber, Integer pageSize, SortingParamsDto sortingParams,
-                                                        VisitSearchingParamsDto searchingParams) {
+    public VisitPaginationDto getVisitPaginationDto(Integer pageNumber, Integer pageSize, SortingParamsDto sortingParams,
+                                                    VisitSearchingParamsDto searchingParams) {
         return VisitPaginationDto.builder()
                 .pageNumber(pageNumber)
                 .pageSize(pageSize)
@@ -56,14 +56,39 @@ public class VisitPaginationSupport {
                 .build();
     }
 
-    public VisitSearchingParamsDto getTelevisitSearchingParams(Long userId, VisitStatusEnum status, VisitTypeEnum type,
-                                                               LocalDateTime startTime, LocalDateTime endTime) {
+    public VisitSearchingParamsDto getVisitSearchingParams(Long userId, VisitStatusEnum status, VisitTypeEnum type,
+                                                           LocalDateTime startTime, LocalDateTime endTime, String address) {
         return VisitSearchingParamsDto.builder()
                 .userId(userId)
                 .visitStatusEnum(status)
                 .visitTypeEnum(type)
                 .startTime(startTime)
                 .endTime(endTime)
+                .address(address)
+                .build();
+    }
+
+    public VisitSearchingParamsDto getVisitSearchingParams(VisitStatusEnum status, VisitTypeEnum type,
+                                                           LocalDateTime startTime, LocalDateTime endTime, String address) {
+        return VisitSearchingParamsDto.builder()
+                .visitStatusEnum(status)
+                .visitTypeEnum(type)
+                .startTime(startTime)
+                .endTime(endTime)
+                .address(address)
+                .build();
+    }
+
+    public VisitSearchingParamsDto getVisitSearchingParams(VisitStatusEnum status, VisitTypeEnum type,
+                                                           LocalDateTime startTime, LocalDateTime endTime,
+                                                           String address, Long doctorId) {
+        return VisitSearchingParamsDto.builder()
+                .visitStatusEnum(status)
+                .doctorId(doctorId)
+                .visitTypeEnum(type)
+                .startTime(startTime)
+                .endTime(endTime)
+                .address(address)
                 .build();
     }
 

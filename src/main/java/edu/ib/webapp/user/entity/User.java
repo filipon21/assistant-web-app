@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -40,6 +41,8 @@ public class User {
     private String userLastName;
 
     private LocalDate birthday;
+
+    private Long age;
 
     @NotBlank
     @Column(unique = true)
@@ -91,11 +94,11 @@ public class User {
     @ToString.Exclude
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
-            name = "USER_TELEVISITS",
+            name = "USER_VISITS",
             joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "televisit_id")}
+            inverseJoinColumns = {@JoinColumn(name = "visit_id")}
     )
-    private List<Visit> visits;
+    private List<Visit> visits = new ArrayList<>();
 
     @JsonBackReference
     @ToString.Exclude

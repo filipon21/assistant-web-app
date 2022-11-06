@@ -8,14 +8,18 @@ import edu.ib.webapp.common.exception.ExceptionMessage;
 import edu.ib.webapp.common.exception.RoleException;
 import edu.ib.webapp.common.exception.UserException;
 import edu.ib.webapp.user.mapper.UserMapper;
+import edu.ib.webapp.user.model.dto.UserInfoDto;
+import edu.ib.webapp.user.model.dto.UserPaginationDto;
 import edu.ib.webapp.user.model.request.UserRequest;
 import edu.ib.webapp.user.model.request.UserUpdateRequest;
 import edu.ib.webapp.user.model.response.AssistantListResponse;
+import edu.ib.webapp.user.model.response.UserListResponse;
 import edu.ib.webapp.user.model.response.UserResponse;
 import edu.ib.webapp.user.repository.RoleRepository;
 import edu.ib.webapp.user.repository.UserRepository;
 import edu.ib.webapp.user.entity.User;
 import edu.ib.webapp.user.repository.specification.AssistantSpecification;
+import edu.ib.webapp.user.repository.specification.UserSpecification;
 import edu.ib.webapp.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +30,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,6 +52,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Transactional
+    @Override
     public UserResponse registerNewUser(UserRequest userRequest) {
         User userCheck = userRepository.findByUserName(userRequest.getUserName()).orElse(null);
 
@@ -69,7 +77,9 @@ public class UserServiceImpl implements UserService {
         user.setIsActive(true);
         user.setPhoneNumber(userRequest.getPhoneNumber());
         user.setRoles(userRoles);
+        user.setTown(userRequest.getTown());
         user.setBirthday(userRequest.getBirthday());
+        user.setAge(ChronoUnit.YEARS.between(userRequest.getBirthday(), LocalDate.now()));
         user.setUserPassword(passwordEncoder.getEncodedPassword(userRequest.getUserPassword()));
         user.setAddress(userRequest.getAddress());
         user.setVoivodeship(userRequest.getVoivodeship());
@@ -126,6 +136,18 @@ public class UserServiceImpl implements UserService {
         Page<AssistantInfoDto> assistantInfoDtoPage = new PageImpl(assistantInfoDtos, assistantPage.getPageable(),
                 assistantPage.getTotalElements());
         return new AssistantListResponse(assistantInfoDtoPage);
+    }
+
+    @Override
+    public UserListResponse getAllUsersPaginated(UserPaginationDto userPaginationDto) {
+        UserSpecification userSpecification = new UserSpecification(userPaginationDto.getSearchingParams());
+        PageRequest userPageRequest = getPageRequest(userPaginationDto);
+        Page<User> userPage = userRepository.findAll(userSpecification, userPageRequest);
+        List<UserInfoDto> userInfoDtos = userPage.stream()
+                .map(userMapper::userToUserInfoDto).collect(Collectors.toList());
+        Page<AssistantInfoDto> userInfoDtoPage = new PageImpl(userInfoDtos, userPage.getPageable(),
+                userPage.getTotalElements());
+        return new UserListResponse(userInfoDtoPage);
     }
 
     @Override

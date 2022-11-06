@@ -2,6 +2,7 @@ package edu.ib.webapp.user.mapper;
 
 import edu.ib.webapp.user.model.dto.AssistantInfoDto;
 import edu.ib.webapp.user.entity.User;
+import edu.ib.webapp.user.model.dto.UserInfoDto;
 import edu.ib.webapp.user.model.response.UserResponse;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -13,4 +14,6 @@ public interface UserMapper {
     UserResponse userToUserResponse(User user);
 
     AssistantInfoDto userToAssistantInfoDto(User user);
+
+    UserInfoDto userToUserInfoDto(User user);
 }

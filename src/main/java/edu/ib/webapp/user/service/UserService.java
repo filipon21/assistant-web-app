@@ -1,9 +1,11 @@
 package edu.ib.webapp.user.service;
 
 import edu.ib.webapp.user.model.dto.AssistantPaginationDto;
+import edu.ib.webapp.user.model.dto.UserPaginationDto;
 import edu.ib.webapp.user.model.request.UserRequest;
 import edu.ib.webapp.user.model.request.UserUpdateRequest;
 import edu.ib.webapp.user.model.response.AssistantListResponse;
+import edu.ib.webapp.user.model.response.UserListResponse;
 import edu.ib.webapp.user.model.response.UserResponse;
 
 public interface UserService {
@@ -17,5 +19,7 @@ public interface UserService {
     UserResponse updateUser(UserUpdateRequest user, Long id);
 
     AssistantListResponse getAllAssistantPaginated(AssistantPaginationDto templatePaginationDto);
+
+    UserListResponse getAllUsersPaginated(UserPaginationDto userPaginationDto);
 
 }

@@ -51,12 +51,15 @@ public class FileServiceImpl implements FileService {
         response.setFileName(fileName);
         response.setSize(size);
         response.setFileCode(filecode);
+        response.setType(multipartFile.getContentType());
 
         Prescription prescription = new Prescription();
         prescription.setFileCode(filecode);
+        prescription.setType(multipartFile.getContentType());
         prescription.setCode(prescriptionRequest.getCode());
-        prescription.setVisit(visit);
         prescriptionRepository.save(prescription);
+
+        visit.setPrescription(prescription);
 
         return response;
     }

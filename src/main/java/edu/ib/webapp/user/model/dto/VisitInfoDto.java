@@ -27,6 +27,8 @@ public class VisitInfoDto {
     @Enumerated(EnumType.STRING)
     private VisitTypeEnum visitTypeEnum;
 
+    private String address;
+
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;

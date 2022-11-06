@@ -5,6 +5,8 @@ import edu.ib.webapp.user.model.dto.AssistantPaginationDto;
 import edu.ib.webapp.user.model.dto.AssistantSearchingParamsDto;
 import edu.ib.webapp.common.enums.SortingDirectionEnum;
 import edu.ib.webapp.common.pagination.SortingParamsDto;
+import edu.ib.webapp.user.model.dto.UserPaginationDto;
+import edu.ib.webapp.user.model.dto.UserSearchingParamsDto;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
@@ -25,14 +27,36 @@ public class PaginationSupport {
                 sortingDirection, sortingParameter);
     }
 
+    public static PageRequest getPageRequest(UserPaginationDto paginationDto) {
+        SortingParamsDto sortingParams = paginationDto.getSortingParams();
+        String sortingDirection = null;
+        String sortingParameter = null;
+        if (sortingParams != null) {
+            sortingDirection = sortingParams.getSortDirection();
+            sortingParameter = sortingParams.getSortParameter();
+        }
+        return getUserPageRequest(paginationDto.getPageNumber(), paginationDto.getPageSize(),
+                sortingDirection, sortingParameter);
+    }
+
     public PageRequest getAssistantPageRequest(Integer page, Integer size, String sortDir, String sortParam) {
         return (StringUtils.isEmpty(sortDir) || StringUtils.isEmpty(sortParam)) ?
-                PageRequest.of(page, size, prepareDefaultTemplateSort()) :
+                PageRequest.of(page, size, prepareDefaultSort()) :
                 PageRequest.of(page, size, prepareSortWithIgnoreCase(sortParam, sortDir));
     }
 
-    private Sort prepareDefaultTemplateSort() {
+    public PageRequest getUserPageRequest(Integer page, Integer size, String sortDir, String sortParam) {
+        return (StringUtils.isEmpty(sortDir) || StringUtils.isEmpty(sortParam)) ?
+                PageRequest.of(page, size, prepareDefaultSortByLastName()) :
+                PageRequest.of(page, size, prepareSortWithIgnoreCase(sortParam, sortDir));
+    }
+
+    private Sort prepareDefaultSort() {
         return Sort.by(Sort.Order.desc("isOnline"));
+    }
+
+    private Sort prepareDefaultSortByLastName() {
+        return Sort.by(Sort.Order.desc("userLastName"));
     }
 
     private Sort prepareSortWithIgnoreCase(String sortParam, String sortDir) {
@@ -57,6 +81,26 @@ public class PaginationSupport {
                 .userFirstName(userFirstName)
                 .userLastName(userLastName)
                 .isOnline(isOnline)
+                .phoneNumber(phoneNumber)
+                .build();
+    }
+
+    public UserPaginationDto getUserPaginationDto(Integer pageNumber, Integer pageSize, SortingParamsDto sortingParams,
+                                                            UserSearchingParamsDto searchingParams) {
+        return UserPaginationDto.builder()
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .sortingParams(sortingParams)
+                .searchingParams(searchingParams)
+                .build();
+    }
+
+    public UserSearchingParamsDto getUserSearchingParams(String userFirstName, String userLastName, String phoneNumber,
+                                                                   String pesel) {
+        return UserSearchingParamsDto.builder()
+                .userFirstName(userFirstName)
+                .userLastName(userLastName)
+                .pesel(pesel)
                 .phoneNumber(phoneNumber)
                 .build();
     }

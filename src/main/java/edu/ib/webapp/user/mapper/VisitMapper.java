@@ -15,5 +15,5 @@ public interface VisitMapper {
 
     Visit visitRequestToVisit(VisitRequest visitRequest);
 
-    VisitInfoDto televisitToTelevisitInfoDto(Visit visit);
+    VisitInfoDto visitToVisitInfoDto(Visit visit);
 }

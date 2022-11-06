@@ -1,5 +1,6 @@
 package edu.ib.webapp.user.model.response;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,12 +10,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileUploadResponse {
-    private String fileName;
-    private String fileCode;
-    private String type;
-    private long size;
+public class PrescriptionResponse {
 
-    // getters and setters are not shown for brevity
+    private Long id;
+
+    private String code;
+
+    private String fileCode;
+
+    private String type;
 
 }

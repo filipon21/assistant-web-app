@@ -2,8 +2,11 @@ package edu.ib.webapp.user.service.implementation;
 
 import edu.ib.webapp.common.exception.ExceptionMessage;
 import edu.ib.webapp.common.exception.UserException;
+import edu.ib.webapp.user.entity.Refferal;
 import edu.ib.webapp.user.entity.Visit;
 import edu.ib.webapp.user.entity.User;
+import edu.ib.webapp.user.enums.DoctorSpecializationEnum;
+import edu.ib.webapp.user.enums.RefferalStatusEnum;
 import edu.ib.webapp.user.enums.VisitStatusEnum;
 import edu.ib.webapp.user.enums.VisitTypeEnum;
 import edu.ib.webapp.user.mapper.VisitMapper;
@@ -12,9 +15,12 @@ import edu.ib.webapp.user.model.dto.VisitPaginationDto;
 import edu.ib.webapp.user.model.request.VisitRequest;
 import edu.ib.webapp.user.model.response.VisitListResponse;
 import edu.ib.webapp.user.model.response.VisitResponse;
+import edu.ib.webapp.user.repository.RefferalRepository;
 import edu.ib.webapp.user.repository.UserRepository;
 import edu.ib.webapp.user.repository.VisitRepository;
-import edu.ib.webapp.user.repository.specification.VisitSpecification;
+import edu.ib.webapp.user.repository.specification.FreeVisitSpecification;
+import edu.ib.webapp.user.repository.specification.HistoryVisitSpecification;
+import edu.ib.webapp.user.repository.specification.UpcomingVisitSpecification;
 import edu.ib.webapp.user.service.VisitService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,49 +50,40 @@ public class VisitServiceImpl implements VisitService {
 
     private final UserRepository userRepository;
 
+    private final RefferalRepository refferalRepository;
+
     @Override
     @Transactional
-    public VisitResponse createVisit(VisitRequest visitRequest, Long userId, Long assistantId, String username) {
-        User userCheck = userRepository.findById(userId).orElse(null);
-        User userCheckByUsername = userRepository.findByUserName(username).orElse(null);
-        if (userCheck == null || userCheckByUsername == null) {
-            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.USER_NOT_FOUND);
-        }
+    public VisitResponse createTeleVisit(VisitRequest visitRequest, Long userId, Long hostId, String username) {
 
-        User assistantCheck = userRepository.findById(assistantId).orElse(null);
+        User userCheck = checkUserInfo(userId, username);
 
-        if (assistantCheck.getAssistant() == null){
-            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.ASSISTANT_NOT_FOUND);
+        User hostCheck = userRepository.findById(hostId).orElse(null);
+
+        if (hostCheck == null) {
+            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.WORKER_NOT_FOUND);
         }
 
         Visit visitsCheck = visitRepository.findFirstByUsers_IdAndVisitStatusEnumOrVisitStatusEnumOrVisitStatusEnumOrderByStartTimeDesc
                 (userId, VisitStatusEnum.WAITING, VisitStatusEnum.UPCOMING, VisitStatusEnum.STARTED);
 
-        if (visitsCheck != null){
+        if (visitsCheck != null) {
             long minutes = ChronoUnit.MINUTES.between(visitsCheck.getStartTime(), LocalDateTime.now());
-            if (minutes<30){
+            if (minutes < 30) {
                 throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.CANNOT_CREATE_NEW_VISIT);
             }
         }
 
-        if (!Objects.equals(userCheckByUsername.getId(), userId)){
-            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.CANNOT_CREATE_VISIT);
-        }
-
         Visit visit = visitMapper.visitRequestToVisit(visitRequest);
+
+        List<Visit> hostCheckVisits = hostCheck.getVisits();
+        hostCheckVisits.add(visit);
 
         List<Visit> visits = userCheck.getVisits();
         visits.add(visit);
 
-        List<Visit> assistantVisits = assistantCheck.getVisits();
-        assistantVisits.add(visit);
-
-        visit.setStartTime(LocalDateTime.now());
-
-        visit.setVisitStatusEnum(VisitStatusEnum.WAITING);
-
         VisitResponse visitResponse = visitMapper.visitToVisitResponse(visitRepository.save(visit));
-        
+
         log.info(String.format("[Visit id: %s][Visit type: %s] Successful created new visit",
                 visit.getId(),
                 visit.getVisitTypeEnum())
@@ -97,19 +94,96 @@ public class VisitServiceImpl implements VisitService {
 
     @Override
     @Transactional
+    public VisitResponse createVisit(VisitRequest visitRequest, Long hostId) {
+        User hostCheck = userRepository.findById(hostId).orElse(null);
+        if (hostCheck == null) {
+            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.WORKER_NOT_FOUND);
+        }
+        Visit visit = visitMapper.visitRequestToVisit(visitRequest);
+        List<Visit> hostCheckVisits = hostCheck.getVisits();
+        hostCheckVisits.add(visit);
+        return visitMapper.visitToVisitResponse(visitRepository.save(visit));
+    }
+
+    @Override
+    @Transactional
+    public VisitResponse addUserToVisit(Long refferalId, Long userId, Long visitId) {
+        User userCheck = findUserById(userId);
+
+        Refferal refferal = findRefferalById(refferalId);
+
+        Visit visitCheck = findVisitById(visitId);
+        List<User> users = visitCheck.getUsers();
+
+        if (users.size() > 2){
+            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.CANNOT_ADD_NEW_USER);
+        }
+
+        if (users.get(0).getDoctor().getDoctorSpecializationEnum() != DoctorSpecializationEnum.INTERNIST && refferal == null) {
+            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.REFFERAL_IS_NEEDED);
+        }
+
+        if (refferal != null) {
+            if (refferal.getDoctorSpecializationEnum() != visitCheck.getUsers().get(0).getDoctor().getDoctorSpecializationEnum()) {
+                throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.BAD_REFFERAL);
+            }
+            refferal.setStatus(RefferalStatusEnum.COMPLETED);
+            visitCheck.setRefferalId(refferalId);
+            refferalRepository.save(refferal);
+        }
+
+        visitCheck.setVisitStatusEnum(VisitStatusEnum.UPCOMING);
+        List<Visit> userVisits = userCheck.getVisits();
+        userVisits.add(visitCheck);
+        userRepository.save(userCheck);
+        visitRepository.save(visitCheck);
+        return visitMapper.visitToVisitResponse(visitCheck);
+    }
+
+    @Override
+    @Transactional
+    public VisitResponse deleteUserFromVisit(Long refferalId, Long userId, Long visitId) {
+        User userCheck = findUserById(userId);
+
+        Refferal refferal = findRefferalById(refferalId);
+
+        Visit visitCheck = findVisitById(visitId);
+
+        List<Visit> visits = userCheck.getVisits();
+
+        visits.remove(visitCheck);
+        userRepository.save(userCheck);
+
+        if (refferal != null){
+            refferal.setStatus(RefferalStatusEnum.ISSUED);
+            refferalRepository.save(refferal);
+        }
+        log.info("usunieto uzytkownika z wizyty");
+
+        visitCheck.setRefferalId(null);
+        visitRepository.save(visitCheck);
+
+        return visitMapper.visitToVisitResponse(visitCheck);
+    }
+
+    @Override
+    @Transactional
     public VisitResponse updateVisit(Long id, VisitRequest visitRequest) {
         Visit visitCheck = findVisitById(id);
         VisitStatusEnum visitStatusEnum = visitRequest.getVisitStatusEnum();
         VisitTypeEnum visitTypeEnum = visitRequest.getVisitTypeEnum();
-        if (visitCheck == null) {
-            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.VISIT_NOT_FOUND);
-        }
-        if (visitStatusEnum != null){
+
+        if (visitStatusEnum != null) {
             visitCheck.setVisitStatusEnum(visitRequest.getVisitStatusEnum());
+            if (visitStatusEnum.equals(VisitStatusEnum.ENDED)) {
+                visitCheck.setEndTime(LocalDateTime.now());
+            }
         }
-        if (visitTypeEnum != null){
+        if (visitTypeEnum != null) {
             visitCheck.setVisitTypeEnum(visitRequest.getVisitTypeEnum());
         }
+        visitCheck.setRecommendation(visitRequest.getRecommendation());
+        visitCheck.setDescription(visitRequest.getDescription());
         visitRepository.save(visitCheck);
 
         return visitMapper.visitToVisitResponse(visitCheck);
@@ -119,40 +193,97 @@ public class VisitServiceImpl implements VisitService {
     public VisitResponse getUserTeleVisit(Long id) {
         Visit visit = visitRepository.
                 findFirstByUsers_IdAndVisitStatusEnumAndVisitTypeEnumIsNotOrVisitTypeEnumIsNotAndVisitStatusEnumOrderByStartTimeDesc(
-                 id, VisitStatusEnum.STARTED, VisitTypeEnum.STATIONARY, VisitTypeEnum.STATIONARY, VisitStatusEnum.WAITING);
-//        Visit visit = visitRepository.
-//                findFirstByUsers_IdAndVisitTypeEnumIsNotOrderByStartTimeDesc(
-//                        id, VisitTypeEnum.STATIONARY);
-        System.out.println(visit);
+                        id, VisitStatusEnum.STARTED, VisitTypeEnum.STATIONARY, VisitTypeEnum.STATIONARY, VisitStatusEnum.WAITING);
+
         return visitMapper.visitToVisitResponse(visit);
     }
 
     @Override
     public VisitResponse getVisit(Long id) {
         Visit visit = findVisitById(id);
-        if (visit == null){
-            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.VISIT_NOT_FOUND);
-        }
         return visitMapper.visitToVisitResponse(visit);
     }
 
     @Override
-    public VisitListResponse getAllTelevisitsPaginated(VisitPaginationDto visitPaginationDto) {
-        VisitSpecification visitSpecification = new VisitSpecification(visitPaginationDto.getSearchingParams());
+    public VisitListResponse getAllHistoryVisitsPaginated(VisitPaginationDto visitPaginationDto, String username) {
+        checkUserInfo(visitPaginationDto.getSearchingParams().getUserId(), username);
 
-        PageRequest televisitPageRequest = getPageRequest(visitPaginationDto);
-        Page<Visit> televisitPage = visitRepository.findAll(visitSpecification, televisitPageRequest);
+        HistoryVisitSpecification historyVisitSpecification = new HistoryVisitSpecification(visitPaginationDto.getSearchingParams());
 
-        List<VisitInfoDto> visitInfoDtos = televisitPage.stream().map(visitMapper::televisitToTelevisitInfoDto)
+        PageRequest visitPageRequest = getPageRequest(visitPaginationDto);
+        Page<Visit> visitPage = visitRepository.findAll(historyVisitSpecification, visitPageRequest);
+        return findVisitListReponse(visitPage);
+    }
+
+    @Override
+    public VisitListResponse getAllUpcomingVisitsPaginated(VisitPaginationDto paginationDto, String username) {
+        checkUserInfo(paginationDto.getSearchingParams().getUserId(), username);
+
+        UpcomingVisitSpecification visitSpecification = new UpcomingVisitSpecification(paginationDto.getSearchingParams());
+
+        PageRequest visitPageRequest = getPageRequest(paginationDto);
+        Page<Visit> visitPage = visitRepository.findAll(visitSpecification, visitPageRequest);
+        return findVisitListReponse(visitPage);
+    }
+
+    @Override
+    public VisitListResponse getAllFreeVisitsPaginated(VisitPaginationDto paginationDto) {
+        FreeVisitSpecification visitSpecification = new FreeVisitSpecification(paginationDto.getSearchingParams());
+
+        PageRequest visitPageRequest = getPageRequest(paginationDto);
+        Page<Visit> visitPage = visitRepository.findAll(visitSpecification, visitPageRequest);
+        return findVisitListReponse(visitPage);
+    }
+
+    public VisitListResponse findVisitListReponse(Page<Visit> visitPage) {
+        List<VisitInfoDto> visitInfoDtos = visitPage.stream().map(visitMapper::visitToVisitInfoDto)
                 .collect(Collectors.toList());
         log.info("Poprawne pobranie listy telewizyt");
 
-        Page<VisitInfoDto> televisitInfoDtoPage = new PageImpl(visitInfoDtos, televisitPage.getPageable(),
-                televisitPage.getTotalElements());
-        return new VisitListResponse(televisitInfoDtoPage);
+        Page<VisitInfoDto> visitInfoDtoPage = new PageImpl(visitInfoDtos, visitPage.getPageable(),
+                visitPage.getTotalElements());
+        return new VisitListResponse(visitInfoDtoPage);
     }
 
-    public Visit findVisitById(Long id){
-        return visitRepository.findById(id).orElse(null);
+    public Visit findVisitById(Long id) {
+        Visit visitCheck = visitRepository.findById(id).orElse(null);
+        if (visitCheck == null) {
+            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.VISIT_NOT_FOUND);
+        }
+        return visitCheck;
+    }
+
+    public User checkUserInfo(Long userId, String username) {
+        User userCheck = userRepository.findById(userId).orElse(null);
+        User userCheckByUsername = userRepository.findByUserName(username).orElse(null);
+        if (userCheck == null || userCheckByUsername == null) {
+            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.USER_NOT_FOUND);
+        }
+
+        if (!Objects.equals(userCheckByUsername.getId(), userId) && userCheckByUsername.getDoctor() == null
+                && userCheckByUsername.getAssistant() == null) {
+            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.CANNOT_CREATE_OR_FIND_VISIT);
+        }
+        return userCheck;
+    }
+
+    public User findUserById(Long userId){
+        User userCheck = userRepository.findById(userId).orElse(null);
+        if (userCheck == null) {
+            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.USER_NOT_FOUND);
+        }
+        return userCheck;
+    }
+
+    public Refferal findRefferalById(Long refferalId){
+        Refferal refferal = null;
+        if (refferalId != null) {
+            refferal = refferalRepository.findById(refferalId).orElse(null);
+            if (refferal == null){
+                throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.REFFERAL_NOT_FOUND);
+            }
+        }
+
+        return refferal;
     }
 }

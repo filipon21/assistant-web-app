@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Data
@@ -31,8 +32,12 @@ public class VisitRequest {
 
     private String recommendation;
 
-    private String prescription;
+    private String description;
 
-    private String exemption;
+    private Long refferalId;
+
+    private PrescriptionRequest prescription;
+
+//    private ExemptionRequest exemption;
 
 }

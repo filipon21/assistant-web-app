@@ -10,6 +10,8 @@ public enum VisitStatusEnum {
     STARTED("W_trakcie"),
     REJECTED("Odrzucono"),
     UPCOMING("Nadchodząca"),
+    FREE("Dostępna"),
+    CANCELLED("Odwołana"),
     ENDED("Zakończona");
 
     private final String type;

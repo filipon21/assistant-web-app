@@ -1,13 +1,11 @@
 package edu.ib.webapp.user.repository.specification;
 
-import edu.ib.webapp.user.entity.Visit;
-import edu.ib.webapp.user.entity.User;
-import edu.ib.webapp.user.entity.User_;
-import edu.ib.webapp.user.entity.Visit_;
+import edu.ib.webapp.user.entity.*;
 import edu.ib.webapp.user.enums.VisitStatusEnum;
 import edu.ib.webapp.user.model.dto.VisitSearchingParamsDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
@@ -17,14 +15,13 @@ import java.util.Objects;
 
 @Data
 @AllArgsConstructor
-public class VisitSpecification implements Specification<Visit> {
-
+public class FreeVisitSpecification implements Specification<Visit> {
     private VisitSearchingParamsDto searchingParams;
 
     @Override
     public Predicate toPredicate(Root<Visit> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
-        Join<Visit, User> joinUser = root.join(Visit_.users);
+        Join<Visit, User> joinDoctor = root.join(Visit_.users);
         criteriaQuery.distinct(true);
 
         if (Objects.nonNull(searchingParams.getVisitStatusEnum()))
@@ -41,19 +38,16 @@ public class VisitSpecification implements Specification<Visit> {
         if (Objects.nonNull(searchingParams.getEndTime()))
             predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(Visit_.END_TIME), searchingParams.getEndTime()));
 
-//        if (StringUtils.isNotEmpty(searchingParams.getUserFirstName())){
-//            predicates.add(criteriaBuilder.and(joinUser.get(User_.id).in(searchingParams.getHostId()),
-//                    criteriaBuilder.like(criteriaBuilder.upper(joinUser.get(User_.USER_FIRST_NAME)),
-//                            "%" + searchingParams.getUserFirstName().toUpperCase() + "%")));
-//        }
+        if (StringUtils.isNotEmpty(searchingParams.getAddress()))
+            predicates.add(criteriaBuilder.like(criteriaBuilder.upper(root.get(User_.ADDRESS)),
+                    "%" + searchingParams.getAddress().toUpperCase() + "%"));
 
-        predicates.add(criteriaBuilder.notEqual(root.get(Visit_.VISIT_STATUS_ENUM),
-                VisitStatusEnum.WAITING));
-        predicates.add(criteriaBuilder.notEqual(root.get(Visit_.VISIT_STATUS_ENUM),
-                VisitStatusEnum.STARTED));
-        predicates.add(joinUser.get(User_.id).in(searchingParams.getUserId()));
+        if (Objects.nonNull(searchingParams.getDoctorId())){
+            predicates.add(joinDoctor.get(User_.DOCTOR).in(searchingParams.getDoctorId()));
+        }
+
+        predicates.add((criteriaBuilder.equal(root.get(Visit_.VISIT_STATUS_ENUM), VisitStatusEnum.FREE)));
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
     }
-
 }

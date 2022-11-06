@@ -7,7 +7,13 @@ import edu.ib.webapp.user.model.response.VisitResponse;
 
 public interface VisitService {
 
-    VisitResponse createVisit(VisitRequest visitRequest, Long userId, Long assistantId, String username);
+    VisitResponse createTeleVisit(VisitRequest visitRequest, Long userId, Long hostId, String username);
+
+    VisitResponse createVisit(VisitRequest visitRequest, Long hostId);
+
+    VisitResponse addUserToVisit(Long refferalId, Long userId, Long visitId);
+
+    VisitResponse deleteUserFromVisit(Long refferalId, Long userId, Long visitId);
 
     VisitResponse updateVisit(Long id, VisitRequest visitRequest);
 
@@ -15,5 +21,9 @@ public interface VisitService {
 
     VisitResponse getVisit(Long id);
 
-    VisitListResponse getAllTelevisitsPaginated(VisitPaginationDto visitPaginationDto);
+    VisitListResponse getAllHistoryVisitsPaginated(VisitPaginationDto visitPaginationDto, String name);
+
+    VisitListResponse getAllFreeVisitsPaginated(VisitPaginationDto visitPaginationDto);
+
+    VisitListResponse getAllUpcomingVisitsPaginated(VisitPaginationDto paginationDto, String name);
 }

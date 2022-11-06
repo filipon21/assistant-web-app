@@ -1,5 +1,6 @@
 package edu.ib.webapp.user.model.dto;
 
+import edu.ib.webapp.user.enums.DoctorSpecializationEnum;
 import edu.ib.webapp.user.enums.VisitStatusEnum;
 import edu.ib.webapp.user.enums.VisitTypeEnum;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,10 @@ public class VisitSearchingParamsDto {
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
+
+    private String address;
+
+    private Long doctorId;
 
     @Enumerated(EnumType.STRING)
     private VisitTypeEnum visitTypeEnum;

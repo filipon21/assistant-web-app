@@ -29,6 +29,8 @@ public class UserResponse {
 
     private String phoneNumber;
 
+    private Long age;
+
     private String pesel;
 
     private String userPassword;
