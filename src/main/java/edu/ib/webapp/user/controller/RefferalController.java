@@ -4,6 +4,7 @@ import edu.ib.webapp.user.enums.DoctorSpecializationEnum;
 import edu.ib.webapp.user.model.response.RefferalResponse;
 import edu.ib.webapp.user.service.RefferalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class RefferalController {
     }
 
     @PostMapping("/{visitId}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ASSISTANT')")
     public RefferalResponse createRefferal(@PathVariable Long visitId,
                                            @RequestParam DoctorSpecializationEnum doctorSpecializationEnum){
         return refferalService.createRefferal(visitId, doctorSpecializationEnum);

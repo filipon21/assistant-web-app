@@ -1,5 +1,8 @@
 package edu.ib.webapp.user.service.implementation;
 
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 import edu.ib.webapp.common.exception.ExceptionMessage;
 import edu.ib.webapp.common.exception.UserException;
 import edu.ib.webapp.user.entity.Prescription;
@@ -60,6 +63,14 @@ public class FileServiceImpl implements FileService {
         prescriptionRepository.save(prescription);
 
         visit.setPrescription(prescription);
+
+        String sid = System.getenv("TWILIO_ACCOUNT_SID");
+        String token = System.getenv("TWILIO_AUTH_TOKEN");
+
+        Twilio.init(sid, token);
+
+        Message.creator(new PhoneNumber("+48500346539"),
+                new PhoneNumber("+13467067816"), "Twój kod do e-Recepty: " + prescriptionRequest.getCode()).create();
 
         return response;
     }

@@ -260,7 +260,7 @@ public class InitServiceImpl implements InitService {
         user.setCountry("Poland");
         user.setPostalCode("43-344");
         user.setVoivodeship("Dolnośląskie");
-        user.setPhoneNumber("400045544");
+        user.setPhoneNumber("+48500346539");
         user.setIsOnline(true);
         user.setIsActive(true);
         user.setPesel("91091971131");

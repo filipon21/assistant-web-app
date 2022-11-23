@@ -26,4 +26,6 @@ public interface VisitService {
     VisitListResponse getAllFreeVisitsPaginated(VisitPaginationDto visitPaginationDto);
 
     VisitListResponse getAllUpcomingVisitsPaginated(VisitPaginationDto paginationDto, String name);
+
+    void sendSMSReminder();
 }

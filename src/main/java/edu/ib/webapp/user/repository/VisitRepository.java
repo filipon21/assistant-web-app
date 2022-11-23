@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Repository
 public interface VisitRepository extends JpaRepository<Visit, Long>, JpaSpecificationExecutor<Visit> {
@@ -16,4 +19,6 @@ public interface VisitRepository extends JpaRepository<Visit, Long>, JpaSpecific
 
     Visit findFirstByUsers_IdAndVisitStatusEnumAndVisitTypeEnumIsNotOrVisitTypeEnumIsNotAndVisitStatusEnumOrderByStartTimeDesc(Long id, VisitStatusEnum started, VisitTypeEnum stationary, VisitTypeEnum stationary1, VisitStatusEnum waiting);
 
+    List<Visit> findByStartTimeIsGreaterThanAndStartTimeIsLessThanAndVisitStatusEnum(LocalDateTime of, LocalDateTime of1,
+                                                                                     VisitStatusEnum visitStatusEnum);
 }

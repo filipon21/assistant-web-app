@@ -1,5 +1,8 @@
 package edu.ib.webapp.user.service.implementation;
 
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 import edu.ib.webapp.common.exception.ExceptionMessage;
 import edu.ib.webapp.common.exception.UserException;
 import edu.ib.webapp.user.entity.Refferal;
@@ -28,10 +31,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
@@ -68,7 +73,7 @@ public class VisitServiceImpl implements VisitService {
                 (userId, VisitStatusEnum.WAITING, VisitStatusEnum.UPCOMING, VisitStatusEnum.STARTED);
 
         if (visitsCheck != null) {
-            long minutes = ChronoUnit.MINUTES.between(visitsCheck.getStartTime(), LocalDateTime.now());
+            long minutes = ChronoUnit.MINUTES.between(LocalDateTime.now(), visitsCheck.getStartTime());
             if (minutes < 30) {
                 throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.CANNOT_CREATE_NEW_VISIT);
             }
@@ -115,7 +120,7 @@ public class VisitServiceImpl implements VisitService {
         Visit visitCheck = findVisitById(visitId);
         List<User> users = visitCheck.getUsers();
 
-        if (users.size() > 2){
+        if (users.size() > 2) {
             throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.CANNOT_ADD_NEW_USER);
         }
 
@@ -154,7 +159,7 @@ public class VisitServiceImpl implements VisitService {
         visits.remove(visitCheck);
         userRepository.save(userCheck);
 
-        if (refferal != null){
+        if (refferal != null) {
             refferal.setStatus(RefferalStatusEnum.ISSUED);
             refferalRepository.save(refferal);
         }
@@ -183,8 +188,11 @@ public class VisitServiceImpl implements VisitService {
             visitCheck.setVisitTypeEnum(visitRequest.getVisitTypeEnum());
         }
         visitCheck.setRecommendation(visitRequest.getRecommendation());
+        visitCheck.setChatLink(visitRequest.getChatLink());
         visitCheck.setDescription(visitRequest.getDescription());
         visitRepository.save(visitCheck);
+
+        log.info("Zaaktualizowano wizytę");
 
         return visitMapper.visitToVisitResponse(visitCheck);
     }
@@ -194,6 +202,7 @@ public class VisitServiceImpl implements VisitService {
         Visit visit = visitRepository.
                 findFirstByUsers_IdAndVisitStatusEnumAndVisitTypeEnumIsNotOrVisitTypeEnumIsNotAndVisitStatusEnumOrderByStartTimeDesc(
                         id, VisitStatusEnum.STARTED, VisitTypeEnum.STATIONARY, VisitTypeEnum.STATIONARY, VisitStatusEnum.WAITING);
+        log.info("Znaleziono telewizyty");
 
         return visitMapper.visitToVisitResponse(visit);
     }
@@ -212,6 +221,7 @@ public class VisitServiceImpl implements VisitService {
 
         PageRequest visitPageRequest = getPageRequest(visitPaginationDto);
         Page<Visit> visitPage = visitRepository.findAll(historyVisitSpecification, visitPageRequest);
+        log.info("Znaleziono historię wizyt");
         return findVisitListReponse(visitPage);
     }
 
@@ -223,7 +233,31 @@ public class VisitServiceImpl implements VisitService {
 
         PageRequest visitPageRequest = getPageRequest(paginationDto);
         Page<Visit> visitPage = visitRepository.findAll(visitSpecification, visitPageRequest);
+        log.info("Znaleziono nadchodzące wizyty");
         return findVisitListReponse(visitPage);
+    }
+
+    @Override
+    @Scheduled(cron = "0 0 7 * * *")
+    public void sendSMSReminder() {
+        String sid = System.getenv("TWILIO_ACCOUNT_SID");
+        String token = System.getenv("TWILIO_AUTH_TOKEN");
+        Twilio.init(sid, token);
+
+
+        LocalDateTime today = LocalDateTime.now();
+        List<Visit> todayVisits = visitRepository.findByStartTimeIsGreaterThanAndStartTimeIsLessThanAndVisitStatusEnum(
+                LocalDateTime.of(today.getYear(), today.getMonth(), today.getDayOfMonth(), 0, 0),
+                LocalDateTime.of(today.getYear(), today.getMonth(), today.getDayOfMonth(), 23, 59), VisitStatusEnum.UPCOMING);
+
+        for (Visit visit:todayVisits) {
+            List<User> users = visit.getUsers();
+            List<User> patient = users.stream().filter(c -> c.getDoctor() == null && c.getAssistant() == null).collect(Collectors.toList());
+            Message.creator(new PhoneNumber(patient.get(0).getPhoneNumber()),
+                    new PhoneNumber("+13467067816"), "Masz zaplanowaną wizytę dzisiejszego dnia. Data i godzina: " +
+                    visit.getStartTime().format(DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss"))).create();
+        }
+        log.info("Wysłano powiadomienie SMS o wizytach");
     }
 
     @Override
@@ -232,13 +266,14 @@ public class VisitServiceImpl implements VisitService {
 
         PageRequest visitPageRequest = getPageRequest(paginationDto);
         Page<Visit> visitPage = visitRepository.findAll(visitSpecification, visitPageRequest);
+        log.info("Znaleziono wolne terminy");
         return findVisitListReponse(visitPage);
     }
 
     public VisitListResponse findVisitListReponse(Page<Visit> visitPage) {
         List<VisitInfoDto> visitInfoDtos = visitPage.stream().map(visitMapper::visitToVisitInfoDto)
                 .collect(Collectors.toList());
-        log.info("Poprawne pobranie listy telewizyt");
+        log.info("Poprawne pobranie listy wizyt");
 
         Page<VisitInfoDto> visitInfoDtoPage = new PageImpl(visitInfoDtos, visitPage.getPageable(),
                 visitPage.getTotalElements());
@@ -267,7 +302,7 @@ public class VisitServiceImpl implements VisitService {
         return userCheck;
     }
 
-    public User findUserById(Long userId){
+    public User findUserById(Long userId) {
         User userCheck = userRepository.findById(userId).orElse(null);
         if (userCheck == null) {
             throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.USER_NOT_FOUND);
@@ -275,11 +310,11 @@ public class VisitServiceImpl implements VisitService {
         return userCheck;
     }
 
-    public Refferal findRefferalById(Long refferalId){
+    public Refferal findRefferalById(Long refferalId) {
         Refferal refferal = null;
         if (refferalId != null) {
             refferal = refferalRepository.findById(refferalId).orElse(null);
-            if (refferal == null){
+            if (refferal == null) {
                 throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.REFFERAL_NOT_FOUND);
             }
         }

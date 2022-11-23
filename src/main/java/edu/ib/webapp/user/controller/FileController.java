@@ -19,6 +19,7 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping("/upload/{visitId}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ASSISTANT')")
     public FileUploadResponse uploadFile(
             @RequestPart("file") MultipartFile multipartFile,
             @PathVariable Long visitId,

@@ -46,6 +46,8 @@ public class Visit {
 
     private Long refferalId;
 
+    private String chatLink;
+
     @OneToMany(mappedBy = "visit",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
@@ -59,6 +61,6 @@ public class Visit {
     @JoinColumn(name = "exemption_id")
     private Exemption exemption;
 
-    @ManyToMany(mappedBy = "visits")
+    @ManyToMany(mappedBy = "visits", fetch = FetchType.EAGER)
     private List<User> users = new ArrayList<>();
 }

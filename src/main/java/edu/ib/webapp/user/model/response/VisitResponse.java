@@ -45,6 +45,9 @@ public class VisitResponse {
 
     private Long refferalId;
 
+    private String chatLink;
+
+
     private String description;
 
     private List<UserResponse> users;

@@ -46,7 +46,7 @@ public class User {
 
     @NotBlank
     @Column(unique = true)
-    @Size(min = 9, max = 9)
+    @Size(min = 9, max = 12)
     private String phoneNumber;
 
     @NotBlank
@@ -111,4 +111,10 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "assistant_id")
     private Assistant assistant;
+
+//    @OneToMany(mappedBy = "user",
+//            fetch = FetchType.EAGER,
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true)
+//    private List<Drug> drugs;
 }

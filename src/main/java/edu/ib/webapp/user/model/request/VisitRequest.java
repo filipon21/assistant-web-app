@@ -36,6 +36,8 @@ public class VisitRequest {
 
     private Long refferalId;
 
+    private String chatLink;
+
     private PrescriptionRequest prescription;
 
 //    private ExemptionRequest exemption;
