@@ -15,7 +15,9 @@ import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+/**
+ * Klasa służąca do tworzenia predykatów przydatnych w filtrowaniu danych w bazie danych
+ */
 @Data
 @AllArgsConstructor
 public class HistoryVisitSpecification implements Specification<Visit> {
@@ -37,7 +39,8 @@ public class HistoryVisitSpecification implements Specification<Visit> {
                     searchingParams.getVisitTypeEnum()));
 
         if (Objects.nonNull(searchingParams.getStartTime()))
-            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(Visit_.START_TIME), searchingParams.getStartTime()));
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(Visit_.START_TIME),
+                    searchingParams.getStartTime()));
 
         if (Objects.nonNull(searchingParams.getEndTime()))
             predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(Visit_.END_TIME), searchingParams.getEndTime()));
@@ -52,8 +55,9 @@ public class HistoryVisitSpecification implements Specification<Visit> {
                 VisitStatusEnum.STARTED));
         predicates.add(criteriaBuilder.notEqual(root.get(Visit_.VISIT_STATUS_ENUM),
                 VisitStatusEnum.UPCOMING));
+        predicates.add(criteriaBuilder.notEqual(root.get(Visit_.VISIT_STATUS_ENUM),
+                VisitStatusEnum.FREE));
         predicates.add(joinUser.get(User_.id).in(searchingParams.getUserId()));
-
         return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
     }
 

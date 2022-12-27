@@ -9,6 +9,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+/**
+ * Klasa służąca do utworzenia encji bazodanowej zwolnień
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

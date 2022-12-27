@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Klasa służąca do przetworzenia logiki biznesowej związanej ze skierowaniami (serwis Springowy)
+ */
 @Service
 @RequiredArgsConstructor
 public class RefferalServiceImpl implements RefferalService {
@@ -34,6 +37,12 @@ public class RefferalServiceImpl implements RefferalService {
 
     private final RefferalMapper refferalMapper;
 
+    /**
+     * Metoda służąca do tworzenia skierowań
+     * @param visitId - id wizyty
+     * @param doctorSpecializationEnum - specjalizacja lekarza
+     * @return dane skierowania lub kod błędu 404 gdy nie odnaleziono wizyty
+     */
     @Override
     @Transactional
     public RefferalResponse createRefferal(Long visitId, DoctorSpecializationEnum doctorSpecializationEnum) {
@@ -52,6 +61,12 @@ public class RefferalServiceImpl implements RefferalService {
         return refferalMapper.refferalToRefferalResponse(refferal);
     }
 
+    /**
+     * Metoda służąca do znalezienia wszystkich skierowań danego użytkownika
+     * @param userId - id użytkownika
+     * @param specialization - specjalizacja lekarza
+     * @return lista skierowań
+     */
     @Override
     public List<RefferalResponse> getAllUserRefferals(Long userId, DoctorSpecializationEnum specialization) {
         User user = userRepository.findById(userId).orElse(null);
@@ -68,6 +83,11 @@ public class RefferalServiceImpl implements RefferalService {
         return refferals.stream().map(refferalMapper::refferalToRefferalResponse).collect(Collectors.toList());
     }
 
+    /**
+     * Metoda służąca do znalezzienia danego skierowania
+     * @param id - id skierowania (bazodanowe)
+     * @return dane skierowania lub kod błędu 404 gdy nie znaleziono skierowania
+     */
     @Override
     public RefferalResponse getRefferal(Long id) {
 
@@ -78,6 +98,10 @@ public class RefferalServiceImpl implements RefferalService {
         return refferalMapper.refferalToRefferalResponse(refferal);
     }
 
+    /**
+     * Metoda służąca do usunięcia skierowania
+     * @param refferalId - id skierowania
+     */
     @Override
     @Transactional
     public void deleteRefferal(Long refferalId) {

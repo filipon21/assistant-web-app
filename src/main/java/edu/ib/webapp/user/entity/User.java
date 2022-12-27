@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Klasa służąca do utworzenia encji bazodanowej użytkownika
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

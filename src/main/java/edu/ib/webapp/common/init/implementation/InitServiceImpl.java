@@ -18,6 +18,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Klasa inicjalizacyjna do tworzenia i zapisywania danych w bazie danych przy starcie aplikacji
+ */
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -114,9 +117,9 @@ public class InitServiceImpl implements InitService {
         doctorCardio.setDoctorSpecializationEnum(DoctorSpecializationEnum.CARDIOLOGIST);
         doctorRepository.save(doctorCardio);
 
-        Doctor doctorInternist = new Doctor();
-        doctorInternist.setDoctorSpecializationEnum(DoctorSpecializationEnum.NEUROLOGIST);
-        doctorRepository.save(doctorInternist);
+        Doctor doctorNeuro = new Doctor();
+        doctorNeuro.setDoctorSpecializationEnum(DoctorSpecializationEnum.NEUROLOGIST);
+        doctorRepository.save(doctorNeuro);
 
         Doctor doctor1 = new Doctor();
         doctor1.setDoctorSpecializationEnum(DoctorSpecializationEnum.INTERNIST);
@@ -225,7 +228,7 @@ public class InitServiceImpl implements InitService {
         doctorIn.setPhoneNumber("666666666");
         doctorIn.setIsActive(true);
 
-        doctorIn.setDoctor(doctorInternist);
+        doctorIn.setDoctor(doctorNeuro);
         Set<Role> doctorRoles5 = new HashSet<>();
         doctorRoles5.add(doctorRole);
         doctorIn.setRoles(doctorRoles);

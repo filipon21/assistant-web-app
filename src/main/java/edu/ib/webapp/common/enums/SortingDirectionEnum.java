@@ -3,6 +3,9 @@ package edu.ib.webapp.common.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Enum służący do określenia kierunku sortowania
+ */
 @Getter
 @AllArgsConstructor
 public enum SortingDirectionEnum {

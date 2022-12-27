@@ -15,6 +15,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.*;
 
+/**
+ * Klasa służąca do tworzenia predykatów przydatnych w filtrowaniu danych w bazie danych
+ */
 @Data
 @AllArgsConstructor
 public class AssistantSpecification implements Specification<User> {

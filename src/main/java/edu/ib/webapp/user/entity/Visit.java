@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Klasa służąca do utworzenia encji bazodanowej wizyt
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

@@ -12,7 +12,9 @@ import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+/**
+ * Klasa służąca do tworzenia predykatów przydatnych w filtrowaniu danych w bazie danych
+ */
 @Data
 @AllArgsConstructor
 public class FreeVisitSpecification implements Specification<Visit> {

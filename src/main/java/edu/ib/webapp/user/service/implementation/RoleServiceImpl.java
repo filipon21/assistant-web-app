@@ -8,12 +8,20 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+/**
+ * Klasa służąca do przetworzenia logiki biznesowej związanej z rolami (serwis Springowy)
+ */
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
 
+    /**
+     * Metoda służąca do stworzenia nowej roli
+     * @param role - dane roli
+     * @return dane roli
+     */
     @Transactional
     public Role createNewRole(Role role) {
         return roleRepository.save(role);

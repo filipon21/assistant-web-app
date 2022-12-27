@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+/**
+ * Komponent (bean) Springowy. Klasa służy do dekodowania hasła użytkownika z bazy danych.
+ */
 @Component
 @RequiredArgsConstructor
 public class PasswordEncoderCustom {

@@ -12,9 +12,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+/**
+ * Klasa "wspomagająca" do paginacji
+ */
 @UtilityClass
 public class PaginationSupport {
 
+    /**
+     * Metoda służąca do utworzenia PageRequesta dla listy asystentów
+     * @param paginationDto - dane do paginacji
+     * @return PageRequest(numer strony, liczba elementów na stronie, kierunek sortowania, parametr po którym jest sortowanie)
+     */
     public static PageRequest getPageRequest(AssistantPaginationDto paginationDto) {
         SortingParamsDto sortingParams = paginationDto.getSortingParams();
         String sortingDirection = null;
@@ -27,6 +35,11 @@ public class PaginationSupport {
                 sortingDirection, sortingParameter);
     }
 
+    /**
+     * Metoda służąca do utworzenia PageRequesta dla listy użytkowników
+     * @param paginationDto - dane do paginacji
+     * @return PageRequest(numer strony, liczba elementów na stronie, kierunek sortowania, parametr po którym jest sortowanie)
+     */
     public static PageRequest getPageRequest(UserPaginationDto paginationDto) {
         SortingParamsDto sortingParams = paginationDto.getSortingParams();
         String sortingDirection = null;

@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+/**
+ * Klasa do obsługi funkcjonalności związanej z użytkownikiem (kontroler Springowy)
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -24,26 +27,60 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Metoda służąca do obsługi zapytania dot. tworzenia nowego użytkownika
+     * @param user - dane użytkownika
+     * @return dane użytkownika
+     */
     @PostMapping({"/register"})
     public UserResponse registerNewUser(@RequestBody @Valid UserRequest user) {
         return userService.registerNewUser(user);
     }
 
+    /**
+     * Metoda służąca do obsługi zapytania dot. edycji danych użytkownika
+     * @param id - id użytkownika
+     * @param user - nowe dane użytkownika
+     * @return dane użytkownika
+     */
     @PatchMapping({"/{id}"})
     public UserResponse updateUser(@RequestBody @Valid UserUpdateRequest user, @PathVariable Long id) {
         return userService.updateUser(user, id);
     }
 
+    /**
+     * Metoda służąca do obsługi zapytania dot. ustawienia statusu użytkownika
+     * @param isOnline - status użytkownika jako wartość fałsz/prawda czy online
+     * @param id - id użytkownika
+     * @return
+     */
     @PatchMapping("{id}/online")
     public UserResponse updateStatus(@RequestParam @Valid Boolean isOnline, @PathVariable Long id){
         return userService.updateStatus(isOnline, id);
     }
 
+    /**
+     * Metoda służąca do obsługi zapytania dot. pobrania danych o użytkowniku
+     * @param id - id użytkownika
+     * @return dane użytkownika
+     */
     @GetMapping("/{id}")
     public UserResponse getUser(@PathVariable Long id){
         return userService.getUser(id);
     }
 
+    /**
+     * Metoda służąca do obsługi zapytania dot. zwrócenia listy wszystkich asystentów (filtracja, paginacja)
+     * @param pageNumber - numer aktualnej strony
+     * @param pageSize - aktualny rozmiar strony
+     * @param sortParameter - parametr po którym jest sortowanie
+     * @param sortDirection - kierunek sortowania (rosnoący (asc), malejacy (desc))
+     * @param userFirstName - imie użytkownika
+     * @param userLastName - nazwisko
+     * @param phoneNumber - numer telefonu
+     * @param isOnline - status
+     * @return zwraca listę asystentów po ew. filtracji
+     */
     @GetMapping("/assistant")
     public AssistantListResponse getAllAssistants(@RequestParam Integer pageNumber,
                                                  @RequestParam Integer pageSize,
@@ -64,6 +101,18 @@ public class UserController {
         return userService.getAllAssistantPaginated(paginationDto);
     }
 
+    /**
+     * Metoda służąca do obsługi zapytania dot. zwrócenia listy wszystkich użytkowników (filtracja, paginacja)
+     * @param pageNumber - numer aktualnej strony
+     * @param pageSize - aktualny rozmiar strony
+     * @param sortParameter - parametr po którym jest sortowanie
+     * @param sortDirection - kierunek sortowania (rosnoący (asc), malejacy (desc))
+     * @param userFirstName - imie użytkownika
+     * @param userLastName - nazwisko
+     * @param phoneNumber - numer telefonu
+     * @param pesel - pesel
+     * @return zwraca listę użytkowników po paginacji i ew. filtracji
+     */
     @GetMapping("/users")
     public UserListResponse getAllUsers(@RequestParam Integer pageNumber,
                                             @RequestParam Integer pageSize,

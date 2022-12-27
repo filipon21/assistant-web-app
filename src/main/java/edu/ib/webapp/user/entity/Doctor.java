@@ -1,12 +1,14 @@
 package edu.ib.webapp.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import edu.ib.webapp.user.enums.DoctorSpecializationEnum;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Klasa służąca do utworzenia encji bazodanowej doktora
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

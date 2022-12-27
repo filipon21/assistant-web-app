@@ -8,9 +8,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Klasa do obsługi pobierania pliku
+ */
 public class FileDownloadUtil {
     private Path foundFile;
 
+    /**
+     * Metoda służąca do znajdowania pliku i zwracania go jako typ Resource
+     * @param fileCode - kod pliku (String)
+     * @return null w przypadku nie znalezienia pliku lub plik jako Resource
+     * @throws IOException błąd input/output przy wczytywania pliku z pamięci komputera
+     */
     public Resource getFileAsResource(String fileCode) throws IOException {
         Path dirPath = Paths.get("Files-Upload");
 

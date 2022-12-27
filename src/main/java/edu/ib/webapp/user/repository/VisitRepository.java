@@ -21,4 +21,6 @@ public interface VisitRepository extends JpaRepository<Visit, Long>, JpaSpecific
 
     List<Visit> findByStartTimeIsGreaterThanAndStartTimeIsLessThanAndVisitStatusEnum(LocalDateTime of, LocalDateTime of1,
                                                                                      VisitStatusEnum visitStatusEnum);
+
+    Visit findFirstByUsers_IdAndVisitStatusEnum(Long id, VisitStatusEnum started);
 }

@@ -44,6 +44,9 @@ import java.util.stream.Collectors;
 
 import static edu.ib.webapp.user.pagination.VisitPaginationSupport.getPageRequest;
 
+/**
+ * Klasa służąca do przetworzenia logiki biznesowej związanej z wizytami (serwis Springowy)
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -57,6 +60,14 @@ public class VisitServiceImpl implements VisitService {
 
     private final RefferalRepository refferalRepository;
 
+    /**
+     * Metoda służąca do tworzenia telewizyty w czasie rzeczywistym przez pacjenta z asystentem
+     * @param visitRequest - dane związane z wizytą
+     * @param userId - id pacjenta (bazodanowe)
+     * @param hostId - id pracownika (bazodanowe)
+     * @param username - nazwa użytkownika pacjenta
+     * @return utworzona wizyta (Visit)
+     */
     @Override
     @Transactional
     public VisitResponse createTeleVisit(VisitRequest visitRequest, Long userId, Long hostId, String username) {
@@ -97,6 +108,12 @@ public class VisitServiceImpl implements VisitService {
         return visitResponse;
     }
 
+    /**
+     * Metoda służąca do utworzenia wizyty przez pracownika
+     * @param visitRequest - dane potrzebne do utworzenia wizyty
+     * @param hostId - id pracwonika (bazodanowwe)
+     * @return utwrzoona wizyta (Visit)
+     */
     @Override
     @Transactional
     public VisitResponse createVisit(VisitRequest visitRequest, Long hostId) {
@@ -107,9 +124,17 @@ public class VisitServiceImpl implements VisitService {
         Visit visit = visitMapper.visitRequestToVisit(visitRequest);
         List<Visit> hostCheckVisits = hostCheck.getVisits();
         hostCheckVisits.add(visit);
+        visit.setStartTime(visitRequest.getStartTime().plusHours(1));
         return visitMapper.visitToVisitResponse(visitRepository.save(visit));
     }
 
+    /**
+     * Metoda służąca do dodania pacjenta do danej wizyty
+     * @param refferalId - skierowanie do wizyty (opcjonalne)
+     * @param userId - id pacjenta (bazodanowe)
+     * @param visitId - id wizyty (bazodanowe)
+     * @return dana wizyta (Visit)
+     */
     @Override
     @Transactional
     public VisitResponse addUserToVisit(Long refferalId, Long userId, Long visitId) {
@@ -120,12 +145,14 @@ public class VisitServiceImpl implements VisitService {
         Visit visitCheck = findVisitById(visitId);
         List<User> users = visitCheck.getUsers();
 
-        if (users.size() > 2) {
+        if (users.size() >= 2) {
             throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.CANNOT_ADD_NEW_USER);
         }
 
-        if (users.get(0).getDoctor().getDoctorSpecializationEnum() != DoctorSpecializationEnum.INTERNIST && refferal == null) {
-            throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.REFFERAL_IS_NEEDED);
+        if (users.get(0).getDoctor() != null){
+            if (users.get(0).getDoctor().getDoctorSpecializationEnum() != DoctorSpecializationEnum.INTERNIST && refferal == null) {
+                throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.REFFERAL_IS_NEEDED);
+            }
         }
 
         if (refferal != null) {
@@ -145,6 +172,13 @@ public class VisitServiceImpl implements VisitService {
         return visitMapper.visitToVisitResponse(visitCheck);
     }
 
+    /**
+     * Metoda służąca do usuwania pacjenta z danej wizyty
+     * @param refferalId - id skierowania (opcjonalne)
+     * @param userId - id użytkownika (bazodanowe)
+     * @param visitId - id wizyty (bazodanowe)
+     * @return daną wizytę (Visit)
+     */
     @Override
     @Transactional
     public VisitResponse deleteUserFromVisit(Long refferalId, Long userId, Long visitId) {
@@ -168,9 +202,17 @@ public class VisitServiceImpl implements VisitService {
         visitCheck.setRefferalId(null);
         visitRepository.save(visitCheck);
 
+        visitCheck.setVisitStatusEnum(VisitStatusEnum.FREE);
+
         return visitMapper.visitToVisitResponse(visitCheck);
     }
 
+    /**
+     * Metoda służąca do edycji wizyty przez pracownika
+     * @param id - id wizyty (bazodanowe)
+     * @param visitRequest - dane do edycji wizyty
+     * @return wizyta (Visit)
+     */
     @Override
     @Transactional
     public VisitResponse updateVisit(Long id, VisitRequest visitRequest) {
@@ -197,6 +239,11 @@ public class VisitServiceImpl implements VisitService {
         return visitMapper.visitToVisitResponse(visitCheck);
     }
 
+    /**
+     * Metoda słuząca do znalezienia aktualnych telewizyt użytkownika
+     * @param id - id użytkownika
+     * @return lista wizyt (Visit)
+     */
     @Override
     public VisitResponse getUserTeleVisit(Long id) {
         Visit visit = visitRepository.
@@ -207,17 +254,44 @@ public class VisitServiceImpl implements VisitService {
         return visitMapper.visitToVisitResponse(visit);
     }
 
+    /**
+     * Metoda służąca do znalezienia wszystkich aktualnych wizyt użytkownika
+     * @param id - id użytkownika (bazodanowe)
+     * @return wizyta (Visit)
+     */
+    @Override
+    public VisitResponse getUserStartedVisit(Long id) {
+        Visit visit = visitRepository.
+                findFirstByUsers_IdAndVisitStatusEnum(
+                        id, VisitStatusEnum.STARTED);
+        log.info("Znaleziono aktualną wizytę!");
+
+        return visitMapper.visitToVisitResponse(visit);
+    }
+
+    /**
+     * Metoda służąca do znalezienia wizyty
+     * @param id - id wizyty (bazodanowe)
+     * @return wizyta (Visit)
+     */
     @Override
     public VisitResponse getVisit(Long id) {
         Visit visit = findVisitById(id);
         return visitMapper.visitToVisitResponse(visit);
     }
 
+    /**
+     * Metoda służąca do zwrócenia wszystkich historycznych wizyt posortowanych i po filtracji
+     * @param visitPaginationDto - dane potrzebne do sortowania i filtracji wizyt
+     * @param username - nazwa użytkownika
+     * @return lista wizyt spaginowanych
+     */
     @Override
     public VisitListResponse getAllHistoryVisitsPaginated(VisitPaginationDto visitPaginationDto, String username) {
         checkUserInfo(visitPaginationDto.getSearchingParams().getUserId(), username);
 
-        HistoryVisitSpecification historyVisitSpecification = new HistoryVisitSpecification(visitPaginationDto.getSearchingParams());
+        HistoryVisitSpecification historyVisitSpecification =
+                new HistoryVisitSpecification(visitPaginationDto.getSearchingParams());
 
         PageRequest visitPageRequest = getPageRequest(visitPaginationDto);
         Page<Visit> visitPage = visitRepository.findAll(historyVisitSpecification, visitPageRequest);
@@ -225,6 +299,12 @@ public class VisitServiceImpl implements VisitService {
         return findVisitListReponse(visitPage);
     }
 
+    /**
+     * Metoda służąca do zwrócenia wszystkich nadchodzących wizyt posortowanych i po filtracji
+     * @param paginationDto - dane potrzebne do sortowania i filtracji wizyt
+     * @param username - nazwa użytkownika
+     * @return lista wizyt spaginowanych
+     */
     @Override
     public VisitListResponse getAllUpcomingVisitsPaginated(VisitPaginationDto paginationDto, String username) {
         checkUserInfo(paginationDto.getSearchingParams().getUserId(), username);
@@ -237,6 +317,9 @@ public class VisitServiceImpl implements VisitService {
         return findVisitListReponse(visitPage);
     }
 
+    /**
+     * Metoda do wysyłania zaplanowanych wiadomości SMS codziennie o 7:00 z nadchodzącymi wizytami użytkownika (dzisiejszymi)
+     */
     @Override
     @Scheduled(cron = "0 0 7 * * *")
     public void sendSMSReminder() {
@@ -260,6 +343,11 @@ public class VisitServiceImpl implements VisitService {
         log.info("Wysłano powiadomienie SMS o wizytach");
     }
 
+    /**
+     * Metoda służąca do zwrócenia wszystkich wolnych wizyt posortowanych i po filtracji
+     * @param paginationDto - dane potrzebne do sortowania i filtracji wizyt
+     * @return lista wizyt spaginowanych
+     */
     @Override
     public VisitListResponse getAllFreeVisitsPaginated(VisitPaginationDto paginationDto) {
         FreeVisitSpecification visitSpecification = new FreeVisitSpecification(paginationDto.getSearchingParams());
@@ -270,7 +358,12 @@ public class VisitServiceImpl implements VisitService {
         return findVisitListReponse(visitPage);
     }
 
-    public VisitListResponse findVisitListReponse(Page<Visit> visitPage) {
+    /**
+     * Metoda służąca do tworzenia paginacji wizyt
+     * @param visitPage - strona wizyt
+     * @return lista wizyt
+     */
+    private VisitListResponse findVisitListReponse(Page<Visit> visitPage) {
         List<VisitInfoDto> visitInfoDtos = visitPage.stream().map(visitMapper::visitToVisitInfoDto)
                 .collect(Collectors.toList());
         log.info("Poprawne pobranie listy wizyt");
@@ -280,7 +373,12 @@ public class VisitServiceImpl implements VisitService {
         return new VisitListResponse(visitInfoDtoPage);
     }
 
-    public Visit findVisitById(Long id) {
+    /**
+     * Metoda służaca do znajdowania wizyt w bazie danych po id
+     * @param id - id wizyty (bazodanowe)
+     * @return wizyta (Visit)
+     */
+    private Visit findVisitById(Long id) {
         Visit visitCheck = visitRepository.findById(id).orElse(null);
         if (visitCheck == null) {
             throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.VISIT_NOT_FOUND);
@@ -288,7 +386,14 @@ public class VisitServiceImpl implements VisitService {
         return visitCheck;
     }
 
-    public User checkUserInfo(Long userId, String username) {
+    /**
+     * Metoda służąca do znalezienia czy istnieje dany użytkownik w bazie danych i czy podana nazwa użytkownika
+     * zgadza się z bazodanową
+     * @param userId - id użytkownika (bazodawnowe)
+     * @param username - nazwa użytkownika
+     * @return użytkownik (User)
+     */
+    private User checkUserInfo(Long userId, String username) {
         User userCheck = userRepository.findById(userId).orElse(null);
         User userCheckByUsername = userRepository.findByUserName(username).orElse(null);
         if (userCheck == null || userCheckByUsername == null) {
@@ -302,6 +407,11 @@ public class VisitServiceImpl implements VisitService {
         return userCheck;
     }
 
+    /**
+     * Metoda służąca do znalezienia użytkownika w bazie danych po id
+     * @param userId - id użytkownika (bazodanowe)
+     * @return
+     */
     public User findUserById(Long userId) {
         User userCheck = userRepository.findById(userId).orElse(null);
         if (userCheck == null) {
@@ -310,6 +420,11 @@ public class VisitServiceImpl implements VisitService {
         return userCheck;
     }
 
+    /**
+     * Metoda służaca do znalezienia skierowań po id
+     * @param refferalId - skierowanie id
+     * @return skierowanie (Refferal)
+     */
     public Refferal findRefferalById(Long refferalId) {
         Refferal refferal = null;
         if (refferalId != null) {

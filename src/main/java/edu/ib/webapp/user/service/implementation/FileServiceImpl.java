@@ -28,6 +28,9 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Klasa służąca do przetworzenia logiki biznesowej związanej z obsługą pliku i e-Receptą (serwis Springowy)
+ */
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
@@ -36,6 +39,14 @@ public class FileServiceImpl implements FileService {
 
     private final VisitRepository visitRepository;
 
+    /**
+     * Metoda służąca do zapisu pliku w folderze aplikacji (pamięci komputera)  i zwolnienia w bazie danych
+     * @param multipartFile - plik przesłany na serwer
+     * @param visitId - id wizyty (bazodanowe)
+     * @param prescriptionRequest - dane dot. e-recepty
+     * @return zwraca dane zapisane w bazie danych dot. e-Recepty
+     * @throws IOException - wyjątek występujący przy zapisie pliku
+     */
     @Override
     @Transactional
     public FileUploadResponse uploadFile(MultipartFile multipartFile, Long visitId, PrescriptionRequest prescriptionRequest) throws IOException {
@@ -75,6 +86,12 @@ public class FileServiceImpl implements FileService {
         return response;
     }
 
+
+    /**
+     * Metoda służąca pobrania pliku e-Recepty z folderu aplikacji
+     * @param fileCode - kod e-Recepty
+     * @return zapisany plik lub kod błędu 404 w przypadku braku pliku
+     */
     @Override
     public ResponseEntity<?> downloadFile(String fileCode) {
         FileDownloadUtil downloadUtil = new FileDownloadUtil();

@@ -8,6 +8,9 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Klasa służąca do utworzenia encji bazodanowej asystenta
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

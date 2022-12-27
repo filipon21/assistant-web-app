@@ -2,7 +2,9 @@ package edu.ib.webapp.user.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
+/**
+ * Enum statusów wizyty
+ */
 @Getter
 @RequiredArgsConstructor
 public enum VisitStatusEnum {

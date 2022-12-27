@@ -5,7 +5,6 @@ import edu.ib.webapp.user.model.dto.AssistantInfoDto;
 import edu.ib.webapp.user.model.dto.AssistantPaginationDto;
 import edu.ib.webapp.common.configuration.PasswordEncoderCustom;
 import edu.ib.webapp.common.exception.ExceptionMessage;
-import edu.ib.webapp.common.exception.RoleException;
 import edu.ib.webapp.common.exception.UserException;
 import edu.ib.webapp.user.mapper.UserMapper;
 import edu.ib.webapp.user.model.dto.UserInfoDto;
@@ -31,13 +30,15 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.ib.webapp.user.pagination.PaginationSupport.getPageRequest;
 
+/**
+ * Klasa służąca do przetworzenia logiki biznesowej związanej z funkcjonalnościami dotyczacych użytkownika (serwis Springowy)
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -51,6 +52,11 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
 
+    /**
+     * Metoda służąca do tworzenia nowych użytkowników
+     * @param userRequest - dane potrzebne do utworzenia użytkownika
+     * @return nowy użytkownik (User)
+     */
     @Transactional
     @Override
     public UserResponse registerNewUser(UserRequest userRequest) {
@@ -62,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
         Role role = roleRepository.findByRoleName("USER").orElse(null);
         if (role == null){
-            throw new RoleException(HttpStatus.NOT_FOUND, ExceptionMessage.ROLE_NOT_FOUND);
+            throw new UserException(HttpStatus.NOT_FOUND, ExceptionMessage.ROLE_NOT_FOUND);
         }
 
         Set<Role> userRoles = new HashSet<>();
@@ -91,6 +97,12 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(user);
     }
 
+    /**
+     * Metoda służąca do edycji statusu użytkownika
+     * @param isOnline - status czy online
+     * @param id - id użytkownika (bazodanowe)
+     * @return zwraca użytkownika (User)
+     */
     @Override
     @Transactional
     public UserResponse updateStatus(Boolean isOnline, Long id) {
@@ -103,6 +115,12 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(userCheck);
     }
 
+    /**
+     * Metoda służąca do edycji użytkownika
+     * @param userRequest - dane potrzebne do edycji
+     * @param id - id użytkownika (bazodanowe)
+     * @return zwraca użytkownika (User)
+     */
     @Override
     @Transactional
     public UserResponse updateUser(UserUpdateRequest userRequest, Long id) {
@@ -114,6 +132,7 @@ public class UserServiceImpl implements UserService {
         userCheck.setUserLastName(userRequest.getUserLastName());
         userCheck.setPhoneNumber(userRequest.getPhoneNumber());
         userCheck.setAddress(userRequest.getAddress());
+        userCheck.setTown(userRequest.getTown());
         userCheck.setVoivodeship(userRequest.getVoivodeship());
         userCheck.setPostalCode(userRequest.getPostalCode());
         userCheck.setCountry(userRequest.getCountry());
@@ -123,6 +142,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(userCheck);
     }
 
+    /**
+     * Metoda służąca do zwrócenia wszystkich asystentów posortowanych i po filtracji
+     * @param assistantPaginationDto - dane potrzebne do filtracji, sortowania, paginacji
+     * @return lista spaginowanych asystentów
+     */
     @Override
     public AssistantListResponse getAllAssistantPaginated(AssistantPaginationDto assistantPaginationDto) {
         AssistantSpecification assistantSpecification = new AssistantSpecification(assistantPaginationDto.getSearchingParams());
@@ -138,6 +162,11 @@ public class UserServiceImpl implements UserService {
         return new AssistantListResponse(assistantInfoDtoPage);
     }
 
+    /**
+     * Metoda służąca do zwrócenia wszystkich użytkowników posortowanych i po filtracji
+     * @param userPaginationDto - dane potrzebne do filtracji, sortowania, paginacji
+     * @return lista spaginowanych użytkowników
+     */
     @Override
     public UserListResponse getAllUsersPaginated(UserPaginationDto userPaginationDto) {
         UserSpecification userSpecification = new UserSpecification(userPaginationDto.getSearchingParams());
@@ -150,6 +179,11 @@ public class UserServiceImpl implements UserService {
         return new UserListResponse(userInfoDtoPage);
     }
 
+    /**
+     * Metoda służąca do zwrócenia danego użytkownika po id
+     * @param id - id użytkownika (bazodanowe)
+     * @return użytkownik (User)
+     */
     @Override
     public UserResponse getUser(Long id) {
       User userCheck = checkIfUserExists(id);
@@ -157,7 +191,11 @@ public class UserServiceImpl implements UserService {
       return userMapper.userToUserResponse(userCheck);
     }
 
-
+    /**
+     * Metoda służąca do sprawdzenia czy użytkownik istnieje w bazie danych
+     * @param id - id użytkownika (bazodanowe)
+     * @return użytkownik (User)
+     */
     private User checkIfUserExists(Long id){
         User userCheck = userRepository.findById(id).orElse(null);
 

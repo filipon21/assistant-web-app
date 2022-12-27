@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-
+/**
+ * Klasa służąca do przetworzenia logiki biznesowej związanej ze zwolnieniami (serwis Springowy)
+ */
 @Service
 @RequiredArgsConstructor
 public class ExemptionServiceImpl implements ExemptionService {
@@ -28,6 +30,13 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     private final ExemptionMapper exemptionMapper;
 
+    /**
+     * Metoda do tworzenia zwolnienia (dostępna tylko dla lekarza i asystenta)
+     * @param visitId - id wizyty (bazodanowe)
+     * @param exemptionRequest - dane potrzebne do utworzenia zwolnienia
+     * @return dane dot. utworzonego zwolnienia lub błąd 404 w przypadku nie znalezienia wizyty lub
+     * błąd 403 w przypadku podania błędnego przedziału czasowego
+     */
     @Override
     @Transactional
     public ExemptionResponse createExamination(Long visitId, ExemptionRequest exemptionRequest) {
@@ -36,7 +45,6 @@ public class ExemptionServiceImpl implements ExemptionService {
             throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.VISIT_NOT_FOUND);
         }
         long seconds = ChronoUnit.SECONDS.between(exemptionRequest.getStartTime(), exemptionRequest.getEndTime());
-        System.out.println(seconds);
 
         if (seconds <= 0){
             throw new UserException(HttpStatus.FORBIDDEN, ExceptionMessage.TIME_IS_NOT_CORRECT);

@@ -18,6 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Komponent (bean) Springowy. Klasa służy do obsługi zapytań przychodzących na serwer.
+ */
 @Slf4j
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -28,8 +31,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private AuthServiceImpl jwtServiceImpl;
 
+    /**
+     * Metoda służąca do filtrowania zapytań przychodzących na serwer. Sprawdza poprawność JSONWebToken.
+     * @param request - przychodzące żądanie na serwer,
+     * @param response - odpowiedź z serwera,
+     * @param filterChain - filtr do przychodzących żądań,
+     * @throws ServletException - generowany przy błędzie przetwarzania żądania HTTP,
+     * @throws IOException - generowany przy utraceniu połączenia.
+     */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
         final String requestTokenHeader = request.getHeader("Authorization");
 

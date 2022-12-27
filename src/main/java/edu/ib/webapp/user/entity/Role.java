@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
+/**
+ * Klasa służąca do utworzenia encji bazodanowej ról
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

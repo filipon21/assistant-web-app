@@ -11,6 +11,14 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class FileUploadUtil {
+
+    /**
+     * Metoda służąca do zapisywania pliku
+     * @param fileName - nazwa pliku pod jaką jest zapisywany
+     * @param multipartFile - plik
+     * @return kod pliku
+     * @throws IOException - ogólny błąd input/output przy zapisywaniu pliku
+     */
     public static String saveFile(String fileName, MultipartFile multipartFile)
             throws IOException {
         Path uploadPath = Paths.get("Files-Upload");

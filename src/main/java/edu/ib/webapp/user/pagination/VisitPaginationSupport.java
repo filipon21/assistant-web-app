@@ -13,6 +13,9 @@ import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 
+/**
+ * Klasa "wspomagająca" do paginacji
+ */
 @UtilityClass
 public class VisitPaginationSupport {
 

@@ -27,6 +27,9 @@ import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Klasa służaca do obsługi logiki związanej z autoryzacją i autentykacją użytkownika.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements UserDetailsService, AuthService {
@@ -41,6 +44,12 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    /**
+     * Metoda służaca do tworzenia JSON Web Tokena.
+     * @param authRequest - przyjmuje email i hasło
+     * @return AuthResponse - dane użytkownika i token
+     * @throws Exception
+     */
     @Transactional
     public AuthResponse createJwtToken(AuthRequest authRequest) throws Exception {
         String userName = authRequest.getUserName();
@@ -60,6 +69,12 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
         return new AuthResponse(userResponse, newGeneratedToken);
     }
 
+    /**
+     * Metoda służąca do znajdowania użytkownika po nazwie użytkownika (email)
+     * @param username - email ( nazwa użytkownika)
+     * @return UserDetails - email, hasło, rola
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUserName(username).orElse(null);
@@ -75,6 +90,11 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
         }
     }
 
+    /**
+     * Metoda słuzaca do znajdowania ról użytkownika
+     * @param user - dane użytkownika
+     * @return Lista ról
+     */
     public Set<SimpleGrantedAuthority> getAuthority(User user) {
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
         user.getRoles().forEach(role -> {
@@ -83,6 +103,12 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
         return authorities;
     }
 
+    /**
+     * Metoda służąca do autentykacji użytkownika (logowania)
+     * @param userName - nazwa użytkownika (email)
+     * @param userPassword - hasło
+     * @throws Exception
+     */
     public void authenticate(String userName, String userPassword) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, userPassword));

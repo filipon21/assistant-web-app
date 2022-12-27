@@ -3,6 +3,9 @@ package edu.ib.webapp.user.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Enum typów specjalizacji doktorów
+ */
 @Getter
 @RequiredArgsConstructor
 public enum DoctorSpecializationEnum {

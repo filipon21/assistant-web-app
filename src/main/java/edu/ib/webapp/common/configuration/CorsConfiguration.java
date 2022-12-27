@@ -5,6 +5,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Klasa konfiguracyjna. Ustawiane są tu dozwolone metody HTTP oraz inne właściwości
+ * jak np. dozwolone nagłówki w zapytaniach
+ */
 @Configuration
 public class CorsConfiguration {
 

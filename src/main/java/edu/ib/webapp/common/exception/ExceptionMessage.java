@@ -3,6 +3,9 @@ package edu.ib.webapp.common.exception;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Enum służący do wywoływania customowych komunikatów o błędach
+ */
 @Getter
 @RequiredArgsConstructor
 public enum ExceptionMessage {

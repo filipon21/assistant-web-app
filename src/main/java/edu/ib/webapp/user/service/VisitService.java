@@ -28,4 +28,6 @@ public interface VisitService {
     VisitListResponse getAllUpcomingVisitsPaginated(VisitPaginationDto paginationDto, String name);
 
     void sendSMSReminder();
+
+    VisitResponse getUserStartedVisit(Long id);
 }
